@@ -1,39 +1,52 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_app_dashboard/login_page.dart';
+import 'package:mobile_app_dashboard/welcome_page.dart';
+import 'firebase_options.dart';
 
 class AppPalette {
   const AppPalette._();
 
-  static const Color midnight = Color(0xFF050A18);
-  static const Color deepNavy = Color(0xFF0F1728);
-  static const Color slate = Color(0xFF182338);
-  static const Color steel = Color(0xFF1F2D43);
-  static const Color storm = Color(0xFF27344B);
-  static const Color mist = Color(0xFF9EB1CC);
-  static const Color sky = Color(0xFF4FA8FF);
-  static const Color ice = Color(0xFF7FC7FF);
-  static const Color lavender = Color(0xFFC3CEED);
-  static const Color highlight = Color(0xFF66E0FF);
-  static const Color openAccent = Color(0xFF56F4D2);
-  static const Color closedAccent = Color(0xFFADB8C7);
-  static const Color cardBorder = Color(0x33FFFFFF);
+  // Sporty vibrant colors
+  static const Color darkBg = Color(0xFF0A0E27);
+  static const Color deepPurple = Color(0xFF1A1B3D);
+  static const Color richPurple = Color(0xFF2E3192);
+  static const Color electricBlue = Color(0xFF00D4FF);
+  static const Color neonPink = Color(0xFFFF006E);
+  static const Color vibrantOrange = Color(0xFFFF6B35);
+  static const Color energyYellow = Color(0xFFFFBE0B);
+  static const Color sportGreen = Color(0xFF06FFA5);
+  static const Color cardDark = Color(0xFF1C1E3B);
+  static const Color textPrimary = Color(0xFFFFFFFF);
+  static const Color textSecondary = Color(0xFFB8B9D4);
+  static const Color textMuted = Color(0xFF7B7D9D);
 
-  static LinearGradient get backgroundGradient => const LinearGradient(
-    colors: [deepNavy, midnight],
+  static final LinearGradient backgroundGradient = const LinearGradient(
+    colors: [darkBg, deepPurple],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static LinearGradient get panelGradient => const LinearGradient(
-    colors: [slate, steel],
+  static final LinearGradient energyGradient = const LinearGradient(
+    colors: [neonPink, vibrantOrange, energyYellow],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-  static LinearGradient get accentGradient => const LinearGradient(
-    colors: [sky, ice],
+  static final LinearGradient sportGradient = const LinearGradient(
+    colors: [electricBlue, sportGreen],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static final LinearGradient purpleGradient = const LinearGradient(
+    colors: [richPurple, Color(0xFF5E3FBE)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static final LinearGradient cardGradient = LinearGradient(
+    colors: [cardDark.withOpacity(0.8), cardDark.withOpacity(0.4)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -41,7 +54,9 @@ class AppPalette {
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const DashboardApp());
 }
 
@@ -51,52 +66,61 @@ class DashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tableau de bord',
+      title: 'FreeGo Sports',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: AppPalette.sky,
+          seedColor: AppPalette.electricBlue,
           brightness: Brightness.dark,
         ).copyWith(
-          background: AppPalette.deepNavy,
-          surface: AppPalette.slate,
-          primary: AppPalette.sky,
-          secondary: AppPalette.ice,
+          background: AppPalette.darkBg,
+          surface: AppPalette.cardDark,
+          primary: AppPalette.electricBlue,
+          secondary: AppPalette.sportGreen,
           onPrimary: Colors.white,
-          onSecondary: Colors.white,
+          onSecondary: Colors.black,
         ),
-        scaffoldBackgroundColor: AppPalette.deepNavy,
+        scaffoldBackgroundColor: AppPalette.darkBg,
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.transparent,
           elevation: 0,
           centerTitle: false,
           titleTextStyle: TextStyle(
             color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.w600,
+            fontSize: 28,
+            fontWeight: FontWeight.w900,
+            letterSpacing: -0.5,
           ),
         ),
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-            backgroundColor: AppPalette.highlight,
-            foregroundColor: AppPalette.deepNavy,
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+            backgroundColor: AppPalette.electricBlue,
+            foregroundColor: Colors.black,
             textStyle: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.5,
             ),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
             ),
+            elevation: 8,
+            shadowColor: AppPalette.electricBlue.withOpacity(0.5),
           ),
         ),
-        iconTheme: const IconThemeData(color: Colors.white, size: 22),
+        iconTheme: const IconThemeData(color: Colors.white, size: 24),
         textTheme: ThemeData(
           brightness: Brightness.dark,
-        ).textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
+        ).textTheme.apply(
+          bodyColor: Colors.white,
+          displayColor: Colors.white,
+          fontFamily: 'Roboto',
+        ),
         useMaterial3: true,
       ),
-      home: const LoginPage(),
+      home: const WelcomePage(),
     );
   }
 }
@@ -111,6 +135,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
+  late final DashboardData data = DashboardData.sample();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -131,8 +156,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final data = DashboardData.sample();
-
     return Container(
       decoration: BoxDecoration(gradient: AppPalette.backgroundGradient),
       child: Scaffold(
@@ -145,42 +168,71 @@ class _HomePageState extends State<HomePage> {
             });
           },
           children: [
-            const OverviewPage(),
+            OverviewPage(data: data),
             DashboardPage(data: data),
           ],
         ),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_filled),
-              label: 'Vue d\'ensemble',
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppPalette.cardDark.withOpacity(0.95),
+                AppPalette.deepPurple.withOpacity(0.95),
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.bar_chart_rounded),
-              label: 'Graphiques',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-          backgroundColor: AppPalette.slate.withOpacity(0.8),
-          selectedItemColor: AppPalette.highlight,
-          unselectedItemColor: AppPalette.mist,
-          type: BottomNavigationBarType.fixed,
-          showUnselectedLabels: false,
-          showSelectedLabels: true,
-          elevation: 0,
+            boxShadow: [
+              BoxShadow(
+                color: AppPalette.electricBlue.withOpacity(0.1),
+                blurRadius: 20,
+                offset: const Offset(0, -4),
+              ),
+            ],
+          ),
+          child: BottomNavigationBar(
+            items: const <BottomNavigationBarItem>[
+              BottomNavigationBarItem(
+                icon: Icon(Icons.dashboard_rounded),
+                activeIcon: Icon(Icons.dashboard),
+                label: 'DASHBOARD',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.analytics_outlined),
+                activeIcon: Icon(Icons.analytics),
+                label: 'ANALYTICS',
+              ),
+            ],
+            currentIndex: _selectedIndex,
+            onTap: _onItemTapped,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: AppPalette.electricBlue,
+            unselectedItemColor: AppPalette.textMuted,
+            type: BottomNavigationBarType.fixed,
+            selectedFontSize: 12,
+            unselectedFontSize: 11,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1.2),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+            elevation: 0,
+          ),
         ),
       ),
     );
   }
 }
 
-class OverviewPage extends StatelessWidget {
-  const OverviewPage({super.key});
+class OverviewPage extends StatefulWidget {
+  const OverviewPage({super.key, required this.data});
+  final DashboardData data;
 
   @override
+  State<OverviewPage> createState() => _OverviewPageState();
+}
+
+class _OverviewPageState extends State<OverviewPage> {
+  @override
   Widget build(BuildContext context) {
-    final data = DashboardData.sample();
+    final data = widget.data;
     final latestTemperature =
         data.temperatureReadings.isNotEmpty
             ? data.temperatureReadings.last.value
@@ -225,12 +277,16 @@ class OverviewPage extends StatelessWidget {
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
-        title: const Text("Vue d'ensemble"),
+        title: const Text("OVERVIEW"),
         actions: [
           IconButton(
-            tooltip: 'Actualiser',
+            tooltip: 'Refresh',
             onPressed: () {},
             icon: const Icon(Icons.refresh_rounded),
+            style: IconButton.styleFrom(
+              backgroundColor: AppPalette.electricBlue.withOpacity(0.2),
+              foregroundColor: AppPalette.electricBlue,
+            ),
           ),
           const SizedBox(width: 8),
         ],
@@ -257,19 +313,19 @@ class OverviewPage extends StatelessWidget {
                   _OverviewHeader(lastUpdated: data.lastUpdatedLabel),
                   const SizedBox(height: 24),
                   const _SectionHeading(
-                    title: 'Points clés',
+                    title: 'KEY METRICS',
                     subtitle:
-                        'Synthèse des indicateurs environnementaux et du statut de la porte',
+                        'Real-time environmental data and door activity status',
                   ),
                   const SizedBox(height: 16),
-                  Wrap(
+                    Wrap(
                     spacing: 18,
                     runSpacing: 18,
                     children: [
                       SizedBox(
                         width: itemWidth,
                         child: _OverviewTile(
-                          title: 'Température actuelle',
+                          title: 'Temperature Now',
                           value:
                               latestTemperature != null
                                   ? '${latestTemperature.toStringAsFixed(1)}°C'
@@ -277,58 +333,50 @@ class OverviewPage extends StatelessWidget {
                           subtitle:
                               (minTemperature != null &&
                                       maxTemperature != null)
-                                  ? 'Min ${minTemperature.toStringAsFixed(1)}°C · Max ${maxTemperature.toStringAsFixed(1)}°C'
+                                  ? 'Range: ${minTemperature.toStringAsFixed(1)}°C - ${maxTemperature.toStringAsFixed(1)}°C'
                                   : null,
-                          icon: Icons.thermostat,
-                          accent: AppPalette.accentGradient,
+                          icon: Icons.thermostat_rounded,
+                          accent: AppPalette.energyGradient,
                         ),
                       ),
                       SizedBox(
                         width: itemWidth,
                         child: _OverviewTile(
-                          title: 'Humidité actuelle',
+                          title: 'Humidity Level',
                           value:
                               latestHumidity != null
                                   ? '${latestHumidity.toStringAsFixed(0)}%'
                                   : '--',
                           subtitle:
                               (minHumidity != null && maxHumidity != null)
-                                  ? 'Min ${minHumidity.toStringAsFixed(0)}% · Max ${maxHumidity.toStringAsFixed(0)}%'
+                                  ? 'Range: ${minHumidity.toStringAsFixed(0)}% - ${maxHumidity.toStringAsFixed(0)}%'
                                   : null,
-                          icon: Icons.water_drop,
-                          accent: const LinearGradient(
-                            colors: [AppPalette.lavender, AppPalette.ice],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          icon: Icons.water_drop_rounded,
+                          accent: AppPalette.sportGradient,
                         ),
                       ),
                       SizedBox(
                         width: itemWidth,
                         child: _OverviewTile(
-                          title: 'Statut de la porte',
-                          value: statusText,
+                          title: 'Door Status',
+                          value: statusText.toUpperCase(),
                           subtitle:
-                              'Dernière mise à jour : ${data.lastUpdatedLabel}',
-                          icon: Icons.meeting_room,
+                              'Last update: ${data.lastUpdatedLabel}',
+                          icon: Icons.sensor_door_rounded,
                           badgeColor:
                               data.doorStatus == DoorStatus.open
-                                  ? AppPalette.openAccent
-                                  : AppPalette.closedAccent,
+                                  ? AppPalette.sportGreen
+                                  : AppPalette.textMuted,
                         ),
                       ),
                       SizedBox(
                         width: itemWidth,
                         child: _OverviewTile(
-                          title: 'Nbre de fermeture et ouverture',
+                          title: 'Total Activity',
                           value: '$totalDoorCycles',
-                          subtitle: 'Aujourd\'hui',
-                          icon: Icons.autorenew,
-                          accent: const LinearGradient(
-                            colors: [AppPalette.sky, AppPalette.mist],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          subtitle: 'Door cycles today',
+                          icon: Icons.autorenew_rounded,
+                          accent: AppPalette.purpleGradient,
                         ),
                       ),
                     ],
@@ -460,23 +508,50 @@ class _TimeRangeFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ranges = ['1h', '24h', '7j'];
-    return SegmentedButton<String>(
-      segments: ranges.map((range) {
-        return ButtonSegment<String>(
-          value: range,
-          label: Text(range),
-        );
-      }).toList(),
-      selected: {selectedRange},
-      onSelectionChanged: (newSelection) {
-        onChanged(newSelection.first);
-      },
-      style: SegmentedButton.styleFrom(
-        backgroundColor: AppPalette.steel,
-        foregroundColor: AppPalette.mist,
-        selectedForegroundColor: AppPalette.deepNavy,
-        selectedBackgroundColor: AppPalette.highlight,
+    final ranges = ['1h', '24h', '7d'];
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppPalette.purpleGradient,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: AppPalette.electricBlue.withOpacity(0.3),
+          width: 2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppPalette.richPurple.withOpacity(0.4),
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(4),
+      child: SegmentedButton<String>(
+        segments: ranges.map((range) {
+          return ButtonSegment<String>(
+            value: range,
+            label: Text(
+              range.toUpperCase(),
+              style: const TextStyle(
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.2,
+              ),
+            ),
+          );
+        }).toList(),
+        selected: {selectedRange},
+        onSelectionChanged: (newSelection) {
+          onChanged(newSelection.first);
+        },
+        style: SegmentedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          foregroundColor: AppPalette.textSecondary,
+          selectedForegroundColor: AppPalette.darkBg,
+          selectedBackgroundColor: AppPalette.electricBlue,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
       ),
     );
   }
@@ -491,66 +566,115 @@ class _OverviewHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    return Container(
-      padding: const EdgeInsets.all(28),
-      decoration: BoxDecoration(
-        gradient: AppPalette.panelGradient,
-        borderRadius: BorderRadius.circular(28),
-        border: Border.all(color: AppPalette.cardBorder),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x33000000),
-            blurRadius: 24,
-            offset: Offset(0, 16),
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: const Duration(milliseconds: 800),
+      curve: Curves.easeOutCubic,
+      builder: (context, value, child) {
+        return Transform.translate(
+          offset: Offset(0, 20 * (1 - value)),
+          child: Opacity(
+            opacity: value,
+            child: child,
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const FreeGoLogo(size: 38),
-          const SizedBox(height: 18),
-          Text(
-            'Bienvenue',
-            style: textTheme.labelLarge?.copyWith(
-              color: AppPalette.mist,
-              fontWeight: FontWeight.w500,
-              letterSpacing: 0.8,
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(32),
+        decoration: BoxDecoration(
+          gradient: AppPalette.purpleGradient,
+          borderRadius: BorderRadius.circular(32),
+          border: Border.all(
+            color: AppPalette.electricBlue.withOpacity(0.3),
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppPalette.richPurple.withOpacity(0.6),
+              blurRadius: 30,
+              offset: const Offset(0, 10),
+              spreadRadius: 2,
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Surveillance du domicile',
-            style: textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.3,
+            BoxShadow(
+              color: AppPalette.electricBlue.withOpacity(0.2),
+              blurRadius: 60,
+              offset: const Offset(0, 20),
             ),
-          ),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Container(
-                decoration: const BoxDecoration(
-                  color: Color(0x3354B5FF),
-                  shape: BoxShape.circle,
-                ),
-                padding: const EdgeInsets.all(10),
-                child: const Icon(
-                  Icons.schedule_rounded,
-                  size: 20,
-                  color: AppPalette.ice,
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const AnimatedFreeGoLogo(size: 42),
+            const SizedBox(height: 24),
+            ShaderMask(
+              shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+              child: Text(
+                'PERFORMANCE TRACKER',
+                style: textTheme.labelLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                  letterSpacing: 2.5,
                 ),
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Synchronisé à $lastUpdated',
-                style: textTheme.bodyMedium?.copyWith(
-                  color: AppPalette.lavender,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Home Monitoring System',
+              style: textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                letterSpacing: -0.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.3),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: AppPalette.sportGreen.withOpacity(0.4),
+                  width: 1.5,
                 ),
               ),
-            ],
-          ),
-        ],
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(
+                      color: AppPalette.sportGreen,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppPalette.sportGreen.withOpacity(0.8),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Icon(
+                    Icons.access_time_rounded,
+                    size: 18,
+                    color: AppPalette.sportGreen,
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'LIVE · Synced at $lastUpdated',
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: AppPalette.textPrimary,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -569,20 +693,25 @@ class _SectionHeading extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.2,
+        ShaderMask(
+          shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+          child: Text(
+            title,
+            style: textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+              letterSpacing: 1.5,
+              color: Colors.white,
+            ),
           ),
         ),
         if (subtitle != null) ...[
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             subtitle!,
             style: textTheme.bodyMedium?.copyWith(
-              color: AppPalette.mist,
-              height: 1.4,
+              color: AppPalette.textSecondary,
+              height: 1.5,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],
@@ -591,23 +720,66 @@ class _SectionHeading extends StatelessWidget {
   }
 }
 
-class FreeGoLogo extends StatelessWidget {
-  const FreeGoLogo({super.key, this.size = 42});
+class AnimatedFreeGoLogo extends StatefulWidget {
+  const AnimatedFreeGoLogo({super.key, this.size = 42});
 
   final double size;
 
   @override
+  State<AnimatedFreeGoLogo> createState() => _AnimatedFreeGoLogoState();
+}
+
+class _AnimatedFreeGoLogoState extends State<AnimatedFreeGoLogo>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final gradient = const LinearGradient(
-      colors: [AppPalette.sky, AppPalette.highlight],
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (context, child) {
+        return FreeGoLogo(size: widget.size, animationValue: _controller.value);
+      },
+    );
+  }
+}
+
+class FreeGoLogo extends StatelessWidget {
+  const FreeGoLogo({super.key, this.size = 42, this.animationValue = 0.0});
+
+  final double size;
+  final double animationValue;
+
+  @override
+  Widget build(BuildContext context) {
+    final gradient = LinearGradient(
+      colors: [
+        Color.lerp(AppPalette.electricBlue, AppPalette.sportGreen, animationValue)!,
+        Color.lerp(AppPalette.sportGreen, AppPalette.energyYellow, animationValue)!,
+      ],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
 
     final textStyle = TextStyle(
       fontSize: size,
-      fontWeight: FontWeight.w800,
-      letterSpacing: -0.8,
+      fontWeight: FontWeight.w900,
+      letterSpacing: -1.2,
       color: Colors.white,
     );
 
@@ -629,14 +801,28 @@ class FreeGoLogo extends StatelessWidget {
               child: Text('Go', style: textStyle),
             ),
             Positioned(
-              right: -size * 0.18,
-              top: -size * 0.55,
+              right: -size * 0.15,
+              top: -size * 0.45,
               child: Transform.rotate(
-                angle: -0.1,
-                child: Icon(
-                  Icons.spa,
-                  size: size * 0.7,
-                  color: AppPalette.highlight,
+                angle: -0.2 + (animationValue * 0.4),
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    gradient: AppPalette.energyGradient,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppPalette.energyYellow.withOpacity(0.6),
+                        blurRadius: 12,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: Icon(
+                    Icons.bolt,
+                    size: size * 0.5,
+                    color: Colors.white,
+                  ),
                 ),
               ),
             ),
@@ -647,7 +833,7 @@ class FreeGoLogo extends StatelessWidget {
   }
 }
 
-class _OverviewTile extends StatelessWidget {
+class _OverviewTile extends StatefulWidget {
   const _OverviewTile({
     required this.title,
     required this.value,
@@ -665,99 +851,186 @@ class _OverviewTile extends StatelessWidget {
   final Color? badgeColor;
 
   @override
+  State<_OverviewTile> createState() => _OverviewTileState();
+}
+
+class _OverviewTileState extends State<_OverviewTile>
+    with SingleTickerProviderStateMixin {
+  bool _isHovered = false;
+  late AnimationController _pulseController;
+
+  @override
+  void initState() {
+    super.initState();
+    _pulseController = AnimationController(
+      duration: const Duration(milliseconds: 1500),
+      vsync: this,
+    )..repeat(reverse: true);
+  }
+
+  @override
+  void dispose() {
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
-    final valueStyle = textTheme.headlineMedium?.copyWith(
-      fontWeight: FontWeight.w700,
-      letterSpacing: 0.2,
+    final valueStyle = textTheme.headlineLarge?.copyWith(
+      fontWeight: FontWeight.w900,
+      letterSpacing: -0.5,
       color: Colors.white,
     );
 
-    final gradient = accent ?? AppPalette.panelGradient;
+    final gradient = widget.accent ?? AppPalette.purpleGradient;
 
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.95, end: 1),
-      duration: const Duration(milliseconds: 450),
-      curve: Curves.easeOutCubic,
-      builder: (context, scale, child) {
-        return Transform.scale(scale: scale, child: child);
-      },
-      child: Container(
-        decoration: BoxDecoration(
-          gradient: gradient,
-          borderRadius: BorderRadius.circular(22),
-          border: Border.all(color: AppPalette.cardBorder),
-          boxShadow: const [
-            BoxShadow(
-              color: Color(0x2F000000),
-              blurRadius: 24,
-              offset: Offset(0, 16),
-            ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (icon != null)
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(14),
-                    gradient: const LinearGradient(
-                      colors: [Color(0x33FFFFFF), Color(0x11FFFFFF)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                  ),
-                  child: Icon(icon, color: AppPalette.lavender, size: 24),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedBuilder(
+        animation: _pulseController,
+        builder: (context, child) {
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0.95, end: 1),
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.elasticOut,
+            builder: (context, scale, child) {
+              return Transform.scale(
+                scale: _isHovered ? 1.03 : scale,
+                child: child,
+              );
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeOutCubic,
+              decoration: BoxDecoration(
+                gradient: gradient,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(
+                  color: _isHovered
+                      ? AppPalette.electricBlue
+                      : AppPalette.electricBlue.withOpacity(0.2),
+                  width: _isHovered ? 2.5 : 1.5,
                 ),
-              if (icon != null) const SizedBox(height: 18),
-              Text(
-                title,
-                style: textTheme.titleMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.82),
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.2,
+                boxShadow: [
+                  BoxShadow(
+                    color: _isHovered
+                        ? AppPalette.electricBlue.withOpacity(0.4)
+                        : Colors.black.withOpacity(0.3),
+                    blurRadius: _isHovered ? 35 : 25,
+                    offset: Offset(0, _isHovered ? 12 : 18),
+                    spreadRadius: _isHovered ? 2 : 0,
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(26),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (widget.icon != null)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          gradient: LinearGradient(
+                            colors: [
+                              _isHovered
+                                  ? AppPalette.electricBlue.withOpacity(0.3)
+                                  : Colors.white.withOpacity(0.15),
+                              _isHovered
+                                  ? AppPalette.sportGreen.withOpacity(0.2)
+                                  : Colors.white.withOpacity(0.05),
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                          boxShadow: _isHovered
+                              ? [
+                            BoxShadow(
+                              color: AppPalette.electricBlue.withOpacity(0.3),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
+                          ]
+                              : null,
+                        ),
+                        child: Icon(
+                          widget.icon,
+                          color: _isHovered ? AppPalette.electricBlue : AppPalette.textPrimary,
+                          size: 28,
+                        ),
+                      ),
+                    if (widget.icon != null) const SizedBox(height: 20),
+                    Text(
+                      widget.title.toUpperCase(),
+                      style: textTheme.titleMedium?.copyWith(
+                        color: AppPalette.textSecondary,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    widget.badgeColor != null
+                        ? Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            widget.badgeColor!.withOpacity(0.25),
+                            widget.badgeColor!.withOpacity(0.15),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                          color: widget.badgeColor!.withOpacity(0.6),
+                          width: 2,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: widget.badgeColor!.withOpacity(0.3),
+                            blurRadius: 12,
+                            spreadRadius: 1,
+                          ),
+                        ],
+                      ),
+                      child: Text(widget.value, style: valueStyle),
+                    )
+                        : ShaderMask(
+                      shaderCallback: (bounds) =>
+                          AppPalette.sportGradient.createShader(bounds),
+                      child: Text(widget.value, style: valueStyle),
+                    ),
+                    if (widget.subtitle != null) ...[
+                      const SizedBox(height: 14),
+                      Text(
+                        widget.subtitle!,
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: AppPalette.textSecondary,
+                          height: 1.5,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              badgeColor != null
-                  ? Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 10,
-                    ),
-                    decoration: BoxDecoration(
-                      color: badgeColor!.withOpacity(0.18),
-                      borderRadius: BorderRadius.circular(18),
-                      border: Border.all(color: badgeColor!.withOpacity(0.45)),
-                    ),
-                    child: Text(value, style: valueStyle),
-                  )
-                  : Text(value, style: valueStyle),
-              if (subtitle != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  subtitle!,
-                  style: textTheme.bodyMedium?.copyWith(
-                    color: Colors.white.withOpacity(0.72),
-                    height: 1.4,
-                  ),
-                ),
-              ],
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
 }
 
-class DashboardCard extends StatelessWidget {
+class DashboardCard extends StatefulWidget {
   const DashboardCard({
     super.key,
     required this.title,
@@ -774,68 +1047,117 @@ class DashboardCard extends StatelessWidget {
   final IconData? icon;
 
   @override
+  State<DashboardCard> createState() => _DashboardCardState();
+}
+
+class _DashboardCardState extends State<DashboardCard> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
 
     final content =
-        contentHeight != null
-            ? SizedBox(height: contentHeight!, child: child)
-            : child;
+        widget.contentHeight != null
+            ? SizedBox(height: widget.contentHeight!, child: widget.child)
+            : widget.child;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppPalette.panelGradient,
-        borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: AppPalette.cardBorder),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x29000000),
-            blurRadius: 26,
-            offset: Offset(0, 24),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.identity()
+          ..translate(0.0, _isHovered ? -8.0 : 0.0)
+          ..scale(_isHovered ? 1.02 : 1.0),
+        decoration: BoxDecoration(
+          gradient: AppPalette.purpleGradient,
+          borderRadius: BorderRadius.circular(28),
+          border: Border.all(
+            color: _isHovered
+                ? AppPalette.electricBlue
+                : AppPalette.electricBlue.withOpacity(0.3),
+            width: _isHovered ? 2.5 : 1.5,
           ),
-        ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(26, 26, 26, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (icon != null)
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(16),
-                  gradient: const LinearGradient(
-                    colors: [Color(0x33FFFFFF), Color(0x00FFFFFF)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+          boxShadow: [
+            BoxShadow(
+              color: _isHovered
+                  ? AppPalette.electricBlue.withOpacity(0.4)
+                  : AppPalette.richPurple.withOpacity(0.3),
+              blurRadius: _isHovered ? 40 : 28,
+              offset: Offset(0, _isHovered ? 16 : 24),
+              spreadRadius: _isHovered ? 2 : 0,
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(28, 28, 28, 26),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (widget.icon != null)
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(18),
+                    gradient: LinearGradient(
+                      colors: [
+                        _isHovered
+                            ? AppPalette.electricBlue.withOpacity(0.3)
+                            : Colors.white.withOpacity(0.15),
+                        _isHovered
+                            ? AppPalette.sportGreen.withOpacity(0.2)
+                            : Colors.white.withOpacity(0.05),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    boxShadow: _isHovered
+                        ? [
+                      BoxShadow(
+                        color: AppPalette.electricBlue.withOpacity(0.4),
+                        blurRadius: 20,
+                        spreadRadius: 2,
+                      ),
+                    ]
+                        : null,
+                  ),
+                  child: Icon(
+                    widget.icon,
+                    color: _isHovered ? AppPalette.electricBlue : AppPalette.textPrimary,
+                    size: 28,
                   ),
                 ),
-                child: Icon(icon, color: AppPalette.ice, size: 26),
-              ),
-            if (icon != null) const SizedBox(height: 18),
-            Text(
-              title,
-              style: textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                letterSpacing: -0.1,
-                color: Colors.white,
-              ),
-            ),
-            if (subtitle != null) ...[
-              const SizedBox(height: 6),
-              Text(
-                subtitle!,
-                style: textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.7),
-                  height: 1.4,
+              if (widget.icon != null) const SizedBox(height: 20),
+              ShaderMask(
+                shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+                child: Text(
+                  widget.title.toUpperCase(),
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 0.5,
+                    color: Colors.white,
+                  ),
                 ),
               ),
+              if (widget.subtitle != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  widget.subtitle!,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: AppPalette.textSecondary,
+                    height: 1.5,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+              const SizedBox(height: 22),
+              content,
             ],
-            const SizedBox(height: 20),
-            content,
-          ],
+          ),
         ),
       ),
     );
@@ -866,7 +1188,7 @@ class TemperatureChart extends StatelessWidget {
     final maxY = readings.map((r) => r.value).reduce((a, b) => a > b ? a : b);
 
     const lineGradient = LinearGradient(
-      colors: [AppPalette.sky, AppPalette.ice],
+      colors: [AppPalette.vibrantOrange, AppPalette.energyYellow],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
@@ -931,18 +1253,34 @@ class TemperatureChart extends StatelessWidget {
             spots: spots,
             isCurved: true,
             gradient: lineGradient,
-            barWidth: 4,
-            dotData: const FlDotData(show: false),
+            barWidth: 5,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 6,
+                  color: AppPalette.energyYellow,
+                  strokeWidth: 2,
+                  strokeColor: AppPalette.vibrantOrange,
+                );
+              },
+            ),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  AppPalette.sky.withOpacity(0.25),
-                  AppPalette.sky.withOpacity(0.04),
+                  AppPalette.vibrantOrange.withOpacity(0.4),
+                  AppPalette.vibrantOrange.withOpacity(0.1),
+                  AppPalette.vibrantOrange.withOpacity(0.02),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
+            ),
+            shadow: Shadow(
+              color: AppPalette.energyYellow.withOpacity(0.5),
+              blurRadius: 8,
             ),
           ),
         ],
@@ -973,7 +1311,7 @@ class HumidityChart extends StatelessWidget {
     final maxY = readings.map((r) => r.value).reduce((a, b) => a > b ? a : b);
 
     const lineGradient = LinearGradient(
-      colors: [AppPalette.lavender, AppPalette.sky],
+      colors: [AppPalette.electricBlue, AppPalette.sportGreen],
       begin: Alignment.topLeft,
       end: Alignment.bottomRight,
     );
@@ -1038,18 +1376,34 @@ class HumidityChart extends StatelessWidget {
             spots: spots,
             isCurved: true,
             gradient: lineGradient,
-            barWidth: 4,
-            dotData: const FlDotData(show: false),
+            barWidth: 5,
+            isStrokeCapRound: true,
+            dotData: FlDotData(
+              show: true,
+              getDotPainter: (spot, percent, barData, index) {
+                return FlDotCirclePainter(
+                  radius: 6,
+                  color: AppPalette.sportGreen,
+                  strokeWidth: 2,
+                  strokeColor: AppPalette.electricBlue,
+                );
+              },
+            ),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  AppPalette.lavender.withOpacity(0.25),
-                  AppPalette.sky.withOpacity(0.05),
+                  AppPalette.electricBlue.withOpacity(0.4),
+                  AppPalette.sportGreen.withOpacity(0.2),
+                  AppPalette.sportGreen.withOpacity(0.05),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
+            ),
+            shadow: Shadow(
+              color: AppPalette.sportGreen.withOpacity(0.5),
+              blurRadius: 8,
             ),
           ),
         ],
@@ -1080,15 +1434,33 @@ class DoorUsageChart extends StatelessWidget {
                 barRods: [
                   BarChartRodData(
                     toY: entry.value.openings.toDouble(),
-                    width: 14,
-                    color: AppPalette.openAccent,
-                    borderRadius: BorderRadius.circular(6),
+                    width: 16,
+                    color: AppPalette.sportGreen,
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: const LinearGradient(
+                      colors: [AppPalette.sportGreen, AppPalette.electricBlue],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                    backDrawRodData: BackgroundBarChartRodData(
+                      show: true,
+                      color: AppPalette.sportGreen.withOpacity(0.1),
+                    ),
                   ),
                   BarChartRodData(
                     toY: entry.value.closures.toDouble(),
-                    width: 14,
-                    color: AppPalette.closedAccent,
-                    borderRadius: BorderRadius.circular(6),
+                    width: 16,
+                    color: AppPalette.neonPink,
+                    borderRadius: BorderRadius.circular(8),
+                    gradient: const LinearGradient(
+                      colors: [AppPalette.neonPink, AppPalette.vibrantOrange],
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                    backDrawRodData: BackgroundBarChartRodData(
+                      show: true,
+                      color: AppPalette.neonPink.withOpacity(0.1),
+                    ),
                   ),
                 ],
               ),
@@ -1181,9 +1553,9 @@ class _LegendRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: const [
-        _LegendEntry(label: 'Ouvertures', color: AppPalette.openAccent),
-        SizedBox(width: 20),
-        _LegendEntry(label: 'Fermetures', color: AppPalette.closedAccent),
+        _LegendEntry(label: 'OPENINGS', color: AppPalette.sportGreen),
+        SizedBox(width: 24),
+        _LegendEntry(label: 'CLOSURES', color: AppPalette.neonPink),
       ],
     );
   }
@@ -1197,17 +1569,43 @@ class _LegendEntry extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [color.withOpacity(0.3), color.withOpacity(0.1)],
         ),
-        const SizedBox(width: 6),
-        Text(label, style: Theme.of(context).textTheme.bodySmall),
-      ],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withOpacity(0.6), width: 1.5),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 14,
+            height: 14,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+              boxShadow: [
+                BoxShadow(
+                  color: color.withOpacity(0.6),
+                  blurRadius: 6,
+                  spreadRadius: 1,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.8,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

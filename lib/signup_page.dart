@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'auth_service.dart';
-import 'main.dart';
+import 'package:mobile_app_dashboard/auth_service.dart';
+import 'package:mobile_app_dashboard/main.dart'; // For HomePage
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  _SignUpPageState createState() => _SignUpPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpPageState extends State<SignUpPage> {
   final AuthService _auth = AuthService();
   final _formKey = GlobalKey<FormState>();
   String email = '';
@@ -23,9 +22,9 @@ class _LoginPageState extends State<LoginPage> {
       extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: ShaderMask(
-          shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+          shaderCallback: (bounds) => AppPalette.energyGradient.createShader(bounds),
           child: const Text(
-            'SIGN IN',
+            'CREATE ACCOUNT',
             style: TextStyle(color: Colors.white),
           ),
         ),
@@ -115,11 +114,11 @@ class _LoginPageState extends State<LoginPage> {
                             width: double.infinity,
                             height: 56,
                             decoration: BoxDecoration(
-                              gradient: AppPalette.sportGradient,
+                              gradient: AppPalette.energyGradient,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppPalette.electricBlue.withOpacity(0.5),
+                                  color: AppPalette.vibrantOrange.withOpacity(0.5),
                                   blurRadius: 20,
                                   offset: const Offset(0, 8),
                                 ),
@@ -134,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                                 ),
                               ),
                               child: const Text(
-                                'SIGN IN',
+                                'SIGN UP',
                                 style: TextStyle(
                                   color: Colors.black,
                                   fontSize: 17,
@@ -144,13 +143,14 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {
-                                  dynamic result = await _auth.signInWithEmailAndPassword(email, password);
+                                  dynamic result = await _auth.registerWithEmailAndPassword(email, password);
                                   if (result == null) {
-                                    setState(() => error = 'Could not sign in with those credentials');
+                                    setState(() => error = 'Please supply a valid email');
                                   } else {
-                                    Navigator.pushReplacement(
+                                    Navigator.pushAndRemoveUntil(
                                       context,
                                       MaterialPageRoute(builder: (context) => const HomePage()),
+                                      (Route<dynamic> route) => false,
                                     );
                                   }
                                 }
