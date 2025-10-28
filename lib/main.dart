@@ -1,7 +1,47 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_app_dashboard/login_page.dart';
 
-void main() {
+class AppPalette {
+  const AppPalette._();
+
+  static const Color midnight = Color(0xFF050A18);
+  static const Color deepNavy = Color(0xFF0F1728);
+  static const Color slate = Color(0xFF182338);
+  static const Color steel = Color(0xFF1F2D43);
+  static const Color storm = Color(0xFF27344B);
+  static const Color mist = Color(0xFF9EB1CC);
+  static const Color sky = Color(0xFF4FA8FF);
+  static const Color ice = Color(0xFF7FC7FF);
+  static const Color lavender = Color(0xFFC3CEED);
+  static const Color highlight = Color(0xFF66E0FF);
+  static const Color openAccent = Color(0xFF56F4D2);
+  static const Color closedAccent = Color(0xFFADB8C7);
+  static const Color cardBorder = Color(0x33FFFFFF);
+
+  static LinearGradient get backgroundGradient => const LinearGradient(
+    colors: [deepNavy, midnight],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static LinearGradient get panelGradient => const LinearGradient(
+    colors: [slate, steel],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static LinearGradient get accentGradient => const LinearGradient(
+    colors: [sky, ice],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+}
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const DashboardApp());
 }
 
@@ -13,10 +53,124 @@ class DashboardApp extends StatelessWidget {
     return MaterialApp(
       title: 'Tableau de bord',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blueAccent),
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: AppPalette.sky,
+          brightness: Brightness.dark,
+        ).copyWith(
+          background: AppPalette.deepNavy,
+          surface: AppPalette.slate,
+          primary: AppPalette.sky,
+          secondary: AppPalette.ice,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+        ),
+        scaffoldBackgroundColor: AppPalette.deepNavy,
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: false,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
+            backgroundColor: AppPalette.highlight,
+            foregroundColor: AppPalette.deepNavy,
+            textStyle: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white, size: 22),
+        textTheme: ThemeData(
+          brightness: Brightness.dark,
+        ).textTheme.apply(bodyColor: Colors.white, displayColor: Colors.white),
         useMaterial3: true,
       ),
-      home: const OverviewPage(),
+      home: const LoginPage(),
+    );
+  }
+}
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
+  final PageController _pageController = PageController();
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final data = DashboardData.sample();
+
+    return Container(
+      decoration: BoxDecoration(gradient: AppPalette.backgroundGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        body: PageView(
+          controller: _pageController,
+          onPageChanged: (index) {
+            setState(() {
+              _selectedIndex = index;
+            });
+          },
+          children: [
+            const OverviewPage(),
+            DashboardPage(data: data),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_filled),
+              label: 'Vue d\'ensemble',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.bar_chart_rounded),
+              label: 'Graphiques',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+          backgroundColor: AppPalette.slate.withOpacity(0.8),
+          selectedItemColor: AppPalette.highlight,
+          unselectedItemColor: AppPalette.mist,
+          type: BottomNavigationBarType.fixed,
+          showUnselectedLabels: false,
+          showSelectedLabels: true,
+          elevation: 0,
+        ),
+      ),
     );
   }
 }
@@ -61,183 +215,123 @@ class OverviewPage extends StatelessWidget {
                 .reduce((a, b) => a > b ? a : b)
             : null;
 
-    final totalOpenings = data.doorCycles.fold<int>(
+    final totalDoorCycles = data.doorCycles.fold<int>(
       0,
-      (sum, stat) => sum + stat.openings,
-    );
-    final totalClosures = data.doorCycles.fold<int>(
-      0,
-      (sum, stat) => sum + stat.closures,
+      (sum, stat) => sum + stat.openings + stat.closures,
     );
     final statusText =
         data.doorStatus == DoorStatus.open ? 'Ouverte' : 'Fermée';
-    final statusColor =
-        data.doorStatus == DoorStatus.open ? Colors.green : Colors.red;
-
     return Scaffold(
-      appBar: AppBar(title: const Text("Vue d'ensemble")),
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final columns =
-              constraints.maxWidth > 1100
-                  ? 3
-                  : constraints.maxWidth > 680
-                  ? 2
-                  : 1;
-          final itemWidth =
-              columns == 1
-                  ? constraints.maxWidth
-                  : (constraints.maxWidth - (columns - 1) * 16) / columns;
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: [
-                    SizedBox(
-                      width: itemWidth,
-                      child: _OverviewTile(
-                        title: 'Température actuelle',
-                        value:
-                            latestTemperature != null
-                                ? '${latestTemperature.toStringAsFixed(1)}°C'
-                                : '--',
-                        subtitle:
-                            (minTemperature != null && maxTemperature != null)
-                                ? 'Min ${minTemperature.toStringAsFixed(1)}°C · Max ${maxTemperature.toStringAsFixed(1)}°C'
-                                : null,
-                        icon: Icons.thermostat,
-                        color: Colors.deepOrange,
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _OverviewTile(
-                        title: 'Humidité actuelle',
-                        value:
-                            latestHumidity != null
-                                ? '${latestHumidity.toStringAsFixed(0)}%'
-                                : '--',
-                        subtitle:
-                            (minHumidity != null && maxHumidity != null)
-                                ? 'Min ${minHumidity.toStringAsFixed(0)}% · Max ${maxHumidity.toStringAsFixed(0)}%'
-                                : null,
-                        icon: Icons.water_drop,
-                        color: Colors.blue,
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _OverviewTile(
-                        title: 'Statut de la porte',
-                        value: statusText,
-                        subtitle:
-                            'Dernière mise à jour : ${data.lastUpdatedLabel}',
-                        icon: Icons.meeting_room,
-                        color: statusColor,
-                      ),
-                    ),
-                    SizedBox(
-                      width: itemWidth,
-                      child: _OverviewTile(
-                        title: 'Cycles de la porte',
-                        value:
-                            '$totalOpenings ouvertures / $totalClosures fermetures',
-                        subtitle: 'Aujourd\'hui',
-                        icon: Icons.autorenew,
-                        color: Colors.purple,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 24),
-                FilledButton.icon(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) => DashboardPage(data: data),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.dashboard_customize_outlined),
-                  label: const Text('Voir le tableau de bord détaillé'),
-                ),
-              ],
-            ),
-          );
-        },
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: const Text("Vue d'ensemble"),
+        actions: [
+          IconButton(
+            tooltip: 'Actualiser',
+            onPressed: () {},
+            icon: const Icon(Icons.refresh_rounded),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
-    );
-  }
-}
-
-class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key, required this.data});
-
-  final DashboardData data;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Tableau de bord')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: SafeArea(
         child: LayoutBuilder(
           builder: (context, constraints) {
             final columns =
-                constraints.maxWidth > 1100
+                constraints.maxWidth > 1200
                     ? 3
                     : constraints.maxWidth > 760
                     ? 2
                     : 1;
             final itemWidth =
-                (constraints.maxWidth - (columns - 1) * 16) / columns;
+                columns == 1
+                    ? constraints.maxWidth
+                    : (constraints.maxWidth - (columns - 1) * 18) / columns;
 
             return SingleChildScrollView(
-              child: Wrap(
-                spacing: 16,
-                runSpacing: 16,
+              padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: itemWidth,
-                    child: DashboardCard(
-                      title: 'Température',
-                      subtitle: 'Évolution sur 24h',
-                      contentHeight: 220,
-                      child: TemperatureChart(
-                        readings: data.temperatureReadings,
+                  _OverviewHeader(lastUpdated: data.lastUpdatedLabel),
+                  const SizedBox(height: 24),
+                  const _SectionHeading(
+                    title: 'Points clés',
+                    subtitle:
+                        'Synthèse des indicateurs environnementaux et du statut de la porte',
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 18,
+                    runSpacing: 18,
+                    children: [
+                      SizedBox(
+                        width: itemWidth,
+                        child: _OverviewTile(
+                          title: 'Température actuelle',
+                          value:
+                              latestTemperature != null
+                                  ? '${latestTemperature.toStringAsFixed(1)}°C'
+                                  : '--',
+                          subtitle:
+                              (minTemperature != null &&
+                                      maxTemperature != null)
+                                  ? 'Min ${minTemperature.toStringAsFixed(1)}°C · Max ${maxTemperature.toStringAsFixed(1)}°C'
+                                  : null,
+                          icon: Icons.thermostat,
+                          accent: AppPalette.accentGradient,
+                        ),
                       ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: itemWidth,
-                    child: DashboardCard(
-                      title: 'Humidité',
-                      subtitle: 'Évolution sur 24h',
-                      contentHeight: 220,
-                      child: HumidityChart(readings: data.humidityReadings),
-                    ),
-                  ),
-                  SizedBox(
-                    width: itemWidth,
-                    child: DashboardCard(
-                      title: 'Porte',
-                      subtitle: 'Ouvertures & fermetures',
-                      contentHeight: 220,
-                      child: DoorUsageChart(stats: data.doorCycles),
-                    ),
-                  ),
-                  SizedBox(
-                    width: itemWidth,
-                    child: DashboardCard(
-                      title: 'Statut de la porte',
-                      contentHeight: 160,
-                      child: DoorStatusPanel(data: data),
-                    ),
+                      SizedBox(
+                        width: itemWidth,
+                        child: _OverviewTile(
+                          title: 'Humidité actuelle',
+                          value:
+                              latestHumidity != null
+                                  ? '${latestHumidity.toStringAsFixed(0)}%'
+                                  : '--',
+                          subtitle:
+                              (minHumidity != null && maxHumidity != null)
+                                  ? 'Min ${minHumidity.toStringAsFixed(0)}% · Max ${maxHumidity.toStringAsFixed(0)}%'
+                                  : null,
+                          icon: Icons.water_drop,
+                          accent: const LinearGradient(
+                            colors: [AppPalette.lavender, AppPalette.ice],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: itemWidth,
+                        child: _OverviewTile(
+                          title: 'Statut de la porte',
+                          value: statusText,
+                          subtitle:
+                              'Dernière mise à jour : ${data.lastUpdatedLabel}',
+                          icon: Icons.meeting_room,
+                          badgeColor:
+                              data.doorStatus == DoorStatus.open
+                                  ? AppPalette.openAccent
+                                  : AppPalette.closedAccent,
+                        ),
+                      ),
+                      SizedBox(
+                        width: itemWidth,
+                        child: _OverviewTile(
+                          title: 'Nbre de fermeture et ouverture',
+                          value: '$totalDoorCycles',
+                          subtitle: 'Aujourd\'hui',
+                          icon: Icons.autorenew,
+                          accent: const LinearGradient(
+                            colors: [AppPalette.sky, AppPalette.mist],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -249,60 +343,414 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key, required this.data});
+
+  final DashboardData data;
+
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  String _selectedRange = '24h';
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: const FreeGoLogo(size: 28),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+          child: LayoutBuilder(
+            builder: (context, constraints) {
+              final columns =
+                  constraints.maxWidth > 1200
+                      ? 3
+                      : constraints.maxWidth > 820
+                      ? 2
+                      : 1;
+              final itemWidth =
+                  columns == 1
+                      ? constraints.maxWidth
+                      : (constraints.maxWidth - (columns - 1) * 20) / columns;
+
+              return SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const _SectionHeading(
+                      title: 'Analyses détaillées',
+                      subtitle:
+                          'Visualisez l’évolution des relevés et l’activité de la porte.',
+                    ),
+                    const SizedBox(height: 16),
+                    _TimeRangeFilter(
+                      selectedRange: _selectedRange,
+                      onChanged: (range) {
+                        if (range != null) {
+                          setState(() {
+                            _selectedRange = range;
+                          });
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      spacing: 20,
+                      runSpacing: 20,
+                      children: [
+                        SizedBox(
+                          width: itemWidth,
+                          child: DashboardCard(
+                            title: 'Température en fonction du temps',
+                            subtitle: 'Évolution sur $_selectedRange',
+                            icon: Icons.thermostat,
+                            contentHeight: 240,
+                            child: TemperatureChart(
+                              readings: widget.data.temperatureReadings,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: itemWidth,
+                          child: DashboardCard(
+                            title: 'Humidité en fonction du temps',
+                            subtitle: 'Évolution sur $_selectedRange',
+                            icon: Icons.water_drop,
+                            contentHeight: 240,
+                            child: HumidityChart(
+                              readings: widget.data.humidityReadings,
+                            ),
+                          ),
+                        ),
+                        SizedBox(
+                          width: itemWidth,
+                          child: DashboardCard(
+                            title: 'Historique de la porte',
+                            subtitle: 'Ouvertures & fermetures',
+                            icon: Icons.meeting_room,
+                            contentHeight: 260,
+                            child: DoorUsageChart(stats: widget.data.doorCycles),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TimeRangeFilter extends StatelessWidget {
+  const _TimeRangeFilter({required this.selectedRange, required this.onChanged});
+
+  final String selectedRange;
+  final ValueChanged<String?> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final ranges = ['1h', '24h', '7j'];
+    return SegmentedButton<String>(
+      segments: ranges.map((range) {
+        return ButtonSegment<String>(
+          value: range,
+          label: Text(range),
+        );
+      }).toList(),
+      selected: {selectedRange},
+      onSelectionChanged: (newSelection) {
+        onChanged(newSelection.first);
+      },
+      style: SegmentedButton.styleFrom(
+        backgroundColor: AppPalette.steel,
+        foregroundColor: AppPalette.mist,
+        selectedForegroundColor: AppPalette.deepNavy,
+        selectedBackgroundColor: AppPalette.highlight,
+      ),
+    );
+  }
+}
+
+class _OverviewHeader extends StatelessWidget {
+  const _OverviewHeader({required this.lastUpdated});
+
+  final String lastUpdated;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(28),
+      decoration: BoxDecoration(
+        gradient: AppPalette.panelGradient,
+        borderRadius: BorderRadius.circular(28),
+        border: Border.all(color: AppPalette.cardBorder),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x33000000),
+            blurRadius: 24,
+            offset: Offset(0, 16),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const FreeGoLogo(size: 38),
+          const SizedBox(height: 18),
+          Text(
+            'Bienvenue',
+            style: textTheme.labelLarge?.copyWith(
+              color: AppPalette.mist,
+              fontWeight: FontWeight.w500,
+              letterSpacing: 0.8,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Surveillance du domicile',
+            style: textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w700,
+              letterSpacing: -0.3,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Container(
+                decoration: const BoxDecoration(
+                  color: Color(0x3354B5FF),
+                  shape: BoxShape.circle,
+                ),
+                padding: const EdgeInsets.all(10),
+                child: const Icon(
+                  Icons.schedule_rounded,
+                  size: 20,
+                  color: AppPalette.ice,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Synchronisé à $lastUpdated',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: AppPalette.lavender,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SectionHeading extends StatelessWidget {
+  const _SectionHeading({required this.title, this.subtitle});
+
+  final String title;
+  final String? subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.2,
+          ),
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: 6),
+          Text(
+            subtitle!,
+            style: textTheme.bodyMedium?.copyWith(
+              color: AppPalette.mist,
+              height: 1.4,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class FreeGoLogo extends StatelessWidget {
+  const FreeGoLogo({super.key, this.size = 42});
+
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final gradient = const LinearGradient(
+      colors: [AppPalette.sky, AppPalette.highlight],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
+    final textStyle = TextStyle(
+      fontSize: size,
+      fontWeight: FontWeight.w800,
+      letterSpacing: -0.8,
+      color: Colors.white,
+    );
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        ShaderMask(
+          shaderCallback: (bounds) => gradient.createShader(bounds),
+          blendMode: BlendMode.srcIn,
+          child: Text('Free', style: textStyle),
+        ),
+        Stack(
+          clipBehavior: Clip.none,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => gradient.createShader(bounds),
+              blendMode: BlendMode.srcIn,
+              child: Text('Go', style: textStyle),
+            ),
+            Positioned(
+              right: -size * 0.18,
+              top: -size * 0.55,
+              child: Transform.rotate(
+                angle: -0.1,
+                child: Icon(
+                  Icons.spa,
+                  size: size * 0.7,
+                  color: AppPalette.highlight,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class _OverviewTile extends StatelessWidget {
   const _OverviewTile({
     required this.title,
     required this.value,
     this.subtitle,
     this.icon,
-    this.color,
+    this.accent,
+    this.badgeColor,
   });
 
   final String title;
   final String value;
   final String? subtitle;
   final IconData? icon;
-  final Color? color;
+  final LinearGradient? accent;
+  final Color? badgeColor;
 
   @override
   Widget build(BuildContext context) {
-    final accent = color ?? Theme.of(context).colorScheme.primary;
     final textTheme = Theme.of(context).textTheme;
 
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (icon != null)
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: accent.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: accent, size: 24),
-              ),
-            if (icon != null) const SizedBox(height: 16),
-            Text(title, style: textTheme.titleMedium),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: textTheme.headlineMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+    final valueStyle = textTheme.headlineMedium?.copyWith(
+      fontWeight: FontWeight.w700,
+      letterSpacing: 0.2,
+      color: Colors.white,
+    );
+
+    final gradient = accent ?? AppPalette.panelGradient;
+
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.95, end: 1),
+      duration: const Duration(milliseconds: 450),
+      curve: Curves.easeOutCubic,
+      builder: (context, scale, child) {
+        return Transform.scale(scale: scale, child: child);
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: gradient,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: AppPalette.cardBorder),
+          boxShadow: const [
+            BoxShadow(
+              color: Color(0x2F000000),
+              blurRadius: 24,
+              offset: Offset(0, 16),
             ),
-            if (subtitle != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                subtitle!,
-                style: textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
-              ),
-            ],
           ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (icon != null)
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(14),
+                    gradient: const LinearGradient(
+                      colors: [Color(0x33FFFFFF), Color(0x11FFFFFF)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                  ),
+                  child: Icon(icon, color: AppPalette.lavender, size: 24),
+                ),
+              if (icon != null) const SizedBox(height: 18),
+              Text(
+                title,
+                style: textTheme.titleMedium?.copyWith(
+                  color: Colors.white.withOpacity(0.82),
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.2,
+                ),
+              ),
+              const SizedBox(height: 10),
+              badgeColor != null
+                  ? Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 10,
+                    ),
+                    decoration: BoxDecoration(
+                      color: badgeColor!.withOpacity(0.18),
+                      borderRadius: BorderRadius.circular(18),
+                      border: Border.all(color: badgeColor!.withOpacity(0.45)),
+                    ),
+                    child: Text(value, style: valueStyle),
+                  )
+                  : Text(value, style: valueStyle),
+              if (subtitle != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  subtitle!,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withOpacity(0.72),
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );
@@ -316,12 +764,14 @@ class DashboardCard extends StatelessWidget {
     required this.child,
     this.subtitle,
     this.contentHeight,
+    this.icon,
   });
 
   final String title;
   final String? subtitle;
   final Widget child;
   final double? contentHeight;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -332,23 +782,58 @@ class DashboardCard extends StatelessWidget {
             ? SizedBox(height: contentHeight!, child: child)
             : child;
 
-    return Card(
-      elevation: 1,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+    return Container(
+      decoration: BoxDecoration(
+        gradient: AppPalette.panelGradient,
+        borderRadius: BorderRadius.circular(26),
+        border: Border.all(color: AppPalette.cardBorder),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x29000000),
+            blurRadius: 26,
+            offset: Offset(0, 24),
+          ),
+        ],
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(26, 26, 26, 24),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: textTheme.titleLarge),
+            if (icon != null)
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  gradient: const LinearGradient(
+                    colors: [Color(0x33FFFFFF), Color(0x00FFFFFF)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                ),
+                child: Icon(icon, color: AppPalette.ice, size: 26),
+              ),
+            if (icon != null) const SizedBox(height: 18),
+            Text(
+              title,
+              style: textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.1,
+                color: Colors.white,
+              ),
+            ),
             if (subtitle != null) ...[
-              const SizedBox(height: 4),
+              const SizedBox(height: 6),
               Text(
                 subtitle!,
-                style: textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+                style: textTheme.bodyMedium?.copyWith(
+                  color: Colors.white.withOpacity(0.7),
+                  height: 1.4,
+                ),
               ),
             ],
-            const SizedBox(height: 16),
+            const SizedBox(height: 20),
             content,
           ],
         ),
@@ -380,12 +865,21 @@ class TemperatureChart extends StatelessWidget {
     final minY = readings.map((r) => r.value).reduce((a, b) => a < b ? a : b);
     final maxY = readings.map((r) => r.value).reduce((a, b) => a > b ? a : b);
 
+    const lineGradient = LinearGradient(
+      colors: [AppPalette.sky, AppPalette.ice],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(
           show: true,
           horizontalInterval: 2,
           drawVerticalLine: false,
+          getDrawingHorizontalLine:
+              (value) =>
+                  FlLine(color: Colors.white.withOpacity(0.08), strokeWidth: 1),
         ),
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
@@ -436,17 +930,15 @@ class TemperatureChart extends StatelessWidget {
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            gradient: const LinearGradient(
-              colors: [Colors.orange, Colors.deepOrange],
-            ),
+            gradient: lineGradient,
             barWidth: 4,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  Colors.deepOrange.withOpacity(0.25),
-                  Colors.orange.withOpacity(0.05),
+                  AppPalette.sky.withOpacity(0.25),
+                  AppPalette.sky.withOpacity(0.04),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -480,12 +972,21 @@ class HumidityChart extends StatelessWidget {
     final minY = readings.map((r) => r.value).reduce((a, b) => a < b ? a : b);
     final maxY = readings.map((r) => r.value).reduce((a, b) => a > b ? a : b);
 
+    const lineGradient = LinearGradient(
+      colors: [AppPalette.lavender, AppPalette.sky],
+      begin: Alignment.topLeft,
+      end: Alignment.bottomRight,
+    );
+
     return LineChart(
       LineChartData(
         gridData: FlGridData(
           show: true,
           horizontalInterval: 5,
           drawVerticalLine: false,
+          getDrawingHorizontalLine:
+              (value) =>
+                  FlLine(color: Colors.white.withOpacity(0.08), strokeWidth: 1),
         ),
         titlesData: FlTitlesData(
           leftTitles: AxisTitles(
@@ -536,17 +1037,15 @@ class HumidityChart extends StatelessWidget {
           LineChartBarData(
             spots: spots,
             isCurved: true,
-            gradient: const LinearGradient(
-              colors: [Colors.lightBlueAccent, Colors.blue],
-            ),
+            gradient: lineGradient,
             barWidth: 4,
             dotData: const FlDotData(show: false),
             belowBarData: BarAreaData(
               show: true,
               gradient: LinearGradient(
                 colors: [
-                  Colors.lightBlueAccent.withOpacity(0.25),
-                  Colors.blue.withOpacity(0.05),
+                  AppPalette.lavender.withOpacity(0.25),
+                  AppPalette.sky.withOpacity(0.05),
                 ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
@@ -582,13 +1081,13 @@ class DoorUsageChart extends StatelessWidget {
                   BarChartRodData(
                     toY: entry.value.openings.toDouble(),
                     width: 14,
-                    color: Colors.green[400],
+                    color: AppPalette.openAccent,
                     borderRadius: BorderRadius.circular(6),
                   ),
                   BarChartRodData(
                     toY: entry.value.closures.toDouble(),
                     width: 14,
-                    color: Colors.red[400],
+                    color: AppPalette.closedAccent,
                     borderRadius: BorderRadius.circular(6),
                   ),
                 ],
@@ -614,6 +1113,11 @@ class DoorUsageChart extends StatelessWidget {
                 show: true,
                 horizontalInterval: 1,
                 drawVerticalLine: false,
+                getDrawingHorizontalLine:
+                    (value) => FlLine(
+                      color: Colors.white.withOpacity(0.08),
+                      strokeWidth: 1,
+                    ),
               ),
               titlesData: FlTitlesData(
                 leftTitles: AxisTitles(
@@ -677,9 +1181,9 @@ class _LegendRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: const [
-        _LegendEntry(label: 'Ouvertures', color: Colors.green),
+        _LegendEntry(label: 'Ouvertures', color: AppPalette.openAccent),
         SizedBox(width: 20),
-        _LegendEntry(label: 'Fermetures', color: Colors.red),
+        _LegendEntry(label: 'Fermetures', color: AppPalette.closedAccent),
       ],
     );
   }
@@ -725,7 +1229,8 @@ class DoorStatusPanel extends StatelessWidget {
     );
 
     final isOpen = data.doorStatus == DoorStatus.open;
-    final statusColor = isOpen ? Colors.green : Colors.red;
+    final statusColor =
+        isOpen ? AppPalette.openAccent : AppPalette.closedAccent;
     final statusText = isOpen ? 'Ouverte' : 'Fermée';
 
     return Column(
@@ -755,21 +1260,21 @@ class DoorStatusPanel extends StatelessWidget {
             _StatusCounter(
               label: 'Ouvertures',
               value: totalOpenings,
-              color: Colors.green[400]!,
+              color: AppPalette.openAccent,
             ),
             _StatusCounter(
               label: 'Fermetures',
               value: totalClosures,
-              color: Colors.red[400]!,
+              color: AppPalette.closedAccent,
             ),
           ],
         ),
         const Spacer(),
         Text(
           'Dernière mise à jour : ${data.lastUpdatedLabel}',
-          style: Theme.of(
-            context,
-          ).textTheme.bodySmall?.copyWith(color: Colors.grey[600]),
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Colors.white.withOpacity(0.65),
+          ),
         ),
       ],
     );
@@ -796,13 +1301,19 @@ class _StatusCounter extends StatelessWidget {
         const SizedBox(height: 4),
         Row(
           children: [
-            Container(
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOut,
               width: 6,
               height: 28,
-              margin: const EdgeInsets.only(right: 6),
+              margin: const EdgeInsets.only(right: 8),
               decoration: BoxDecoration(
-                color: color,
-                borderRadius: BorderRadius.circular(3),
+                gradient: LinearGradient(
+                  colors: [color.withOpacity(0.7), color],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ),
+                borderRadius: BorderRadius.circular(4),
               ),
             ),
             Text(

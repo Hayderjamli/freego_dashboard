@@ -14,7 +14,7 @@
 	Otherwise, create the project structure manually using available file creation tools.
 	-->
 
-- [x] Customize the Project (Replaced counter app with a dashboard for temperature, humidity, and door metrics.)
+- [x] Customize the Project (Added overview landing page, detailed dashboard charts, and a refreshed blue/gray UI theme.)
 	<!--
 	Verify that all previous steps have been completed successfully and you have marked the step as completed.
 	Develop a plan to modify codebase according to user requirements.

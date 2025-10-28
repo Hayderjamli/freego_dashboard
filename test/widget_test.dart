@@ -28,7 +28,7 @@ void main() {
     await tester.tap(find.text('Voir le tableau de bord détaillé'));
     await tester.pumpAndSettle();
 
-    expect(find.text('Tableau de bord'), findsOneWidget);
+    expect(find.byType(FreeGoLogo), findsWidgets);
     expect(find.text('Température'), findsOneWidget);
     expect(find.text('Humidité'), findsOneWidget);
   });
