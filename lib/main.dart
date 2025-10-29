@@ -2,6 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_dashboard/welcome_page.dart';
+import 'package:mobile_app_dashboard/settings_page.dart';
+import 'package:mobile_app_dashboard/notifications_page.dart';
+import 'package:mobile_app_dashboard/notification_service.dart';
 import 'firebase_options.dart';
 
 class AppPalette {
@@ -66,7 +69,7 @@ class DashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FreeGo Sports',
+      title: 'FreeGo',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
@@ -136,6 +139,39 @@ class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
   late final DashboardData data = DashboardData.sample();
+  final ThresholdSettings settings = ThresholdSettings();
+  final NotificationService notificationService = NotificationService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Check thresholds periodically (demo)
+    Future.delayed(const Duration(seconds: 5), () {
+      _checkThresholds();
+    });
+  }
+
+  void _checkThresholds() {
+    if (!mounted) return;
+    
+    final latestTemp = data.temperatureReadings.isNotEmpty 
+        ? data.temperatureReadings.last.value 
+        : 20.0;
+    final latestHumidity = data.humidityReadings.isNotEmpty 
+        ? data.humidityReadings.last.value 
+        : 50.0;
+    final isDoorOpen = data.doorStatus == DoorStatus.open;
+
+    notificationService.checkThresholds(
+      currentTemp: latestTemp,
+      currentHumidity: latestHumidity,
+      isDoorOpen: isDoorOpen,
+      doorOpenMinutes: 6, // Demo: door has been open for 6 minutes
+      settings: settings,
+    );
+
+    setState(() {}); // Refresh to show notification badge
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -168,8 +204,9 @@ class _HomePageState extends State<HomePage> {
             });
           },
           children: [
-            OverviewPage(data: data),
+            OverviewPage(data: data, settings: settings),
             DashboardPage(data: data),
+            SettingsPage(settings: settings),
           ],
         ),
         bottomNavigationBar: Container(
@@ -191,16 +228,60 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           child: BottomNavigationBar(
-            items: const <BottomNavigationBarItem>[
-              BottomNavigationBarItem(
+            items: <BottomNavigationBarItem>[
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.dashboard_rounded),
                 activeIcon: Icon(Icons.dashboard),
                 label: 'DASHBOARD',
               ),
-              BottomNavigationBarItem(
+              const BottomNavigationBarItem(
                 icon: Icon(Icons.analytics_outlined),
                 activeIcon: Icon(Icons.analytics),
                 label: 'ANALYTICS',
+              ),
+              BottomNavigationBarItem(
+                icon: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    const Icon(Icons.settings_outlined),
+                    if (notificationService.unreadCount > 0)
+                      Positioned(
+                        right: -6,
+                        top: -4,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: AppPalette.neonPink,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: AppPalette.neonPink.withOpacity(0.6),
+                                blurRadius: 8,
+                                spreadRadius: 2,
+                              ),
+                            ],
+                          ),
+                          constraints: const BoxConstraints(
+                            minWidth: 18,
+                            minHeight: 18,
+                          ),
+                          child: Text(
+                            notificationService.unreadCount > 9 
+                                ? '9+' 
+                                : '${notificationService.unreadCount}',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w900,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+                activeIcon: const Icon(Icons.settings),
+                label: 'SETTINGS',
               ),
             ],
             currentIndex: _selectedIndex,
@@ -222,14 +303,17 @@ class _HomePageState extends State<HomePage> {
 }
 
 class OverviewPage extends StatefulWidget {
-  const OverviewPage({super.key, required this.data});
+  const OverviewPage({super.key, required this.data, required this.settings});
   final DashboardData data;
+  final ThresholdSettings settings;
 
   @override
   State<OverviewPage> createState() => _OverviewPageState();
 }
 
 class _OverviewPageState extends State<OverviewPage> {
+  final NotificationService _notificationService = NotificationService();
+
   @override
   Widget build(BuildContext context) {
     final data = widget.data;
@@ -279,6 +363,59 @@ class _OverviewPageState extends State<OverviewPage> {
       appBar: AppBar(
         title: const Text("OVERVIEW"),
         actions: [
+          Stack(
+            clipBehavior: Clip.none,
+            children: [
+              IconButton(
+                tooltip: 'Notifications',
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                  ).then((_) => setState(() {}));
+                },
+                icon: const Icon(Icons.notifications_outlined),
+                style: IconButton.styleFrom(
+                  backgroundColor: AppPalette.neonPink.withOpacity(0.2),
+                  foregroundColor: AppPalette.neonPink,
+                ),
+              ),
+              if (_notificationService.unreadCount > 0)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: AppPalette.neonPink,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppPalette.neonPink.withOpacity(0.6),
+                          blurRadius: 8,
+                          spreadRadius: 2,
+                        ),
+                      ],
+                    ),
+                    constraints: const BoxConstraints(
+                      minWidth: 16,
+                      minHeight: 16,
+                    ),
+                    child: Text(
+                      _notificationService.unreadCount > 9 
+                          ? '9+' 
+                          : '${_notificationService.unreadCount}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 9,
+                        fontWeight: FontWeight.w900,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+            ],
+          ),
           IconButton(
             tooltip: 'Refresh',
             onPressed: () {},
@@ -1628,7 +1765,7 @@ class DoorStatusPanel extends StatelessWidget {
 
     final isOpen = data.doorStatus == DoorStatus.open;
     final statusColor =
-        isOpen ? AppPalette.openAccent : AppPalette.closedAccent;
+        isOpen ? AppPalette.sportGreen : AppPalette.textMuted;
     final statusText = isOpen ? 'Ouverte' : 'Fermée';
 
     return Column(
@@ -1658,12 +1795,12 @@ class DoorStatusPanel extends StatelessWidget {
             _StatusCounter(
               label: 'Ouvertures',
               value: totalOpenings,
-              color: AppPalette.openAccent,
+              color: AppPalette.sportGreen,
             ),
             _StatusCounter(
               label: 'Fermetures',
               value: totalClosures,
-              color: AppPalette.closedAccent,
+              color: AppPalette.neonPink,
             ),
           ],
         ),
