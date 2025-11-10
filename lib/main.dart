@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'dart:math' as math;
+
+import 'pi_viewer.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,12 +37,13 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
-class _DashboardPageState extends State<DashboardPage> with TickerProviderStateMixin {
+class _DashboardPageState extends State<DashboardPage>
+    with TickerProviderStateMixin {
   bool isDoorOpen = false;
   int doorActivityCount = 12;
   double currentTemperature = 22.5;
   double currentHumidity = 48.0;
-  
+
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
 
@@ -72,7 +74,7 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat(reverse: true);
-    
+
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
@@ -84,6 +86,32 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
     super.dispose();
   }
 
+  void _addSensorReading(double t, double h) {
+    setState(() {
+      currentTemperature = t;
+      currentHumidity = h;
+
+      // Append new readings and keep the last 7 points for the charts
+      const int maxPoints = 7;
+      temperatureData.add(FlSpot(temperatureData.length.toDouble(), t));
+      humidityData.add(FlSpot(humidityData.length.toDouble(), h));
+
+      if (temperatureData.length > maxPoints) {
+        temperatureData.removeAt(0);
+        for (int i = 0; i < temperatureData.length; i++) {
+          temperatureData[i] = FlSpot(i.toDouble(), temperatureData[i].y);
+        }
+      }
+
+      if (humidityData.length > maxPoints) {
+        humidityData.removeAt(0);
+        for (int i = 0; i < humidityData.length; i++) {
+          humidityData[i] = FlSpot(i.toDouble(), humidityData[i].y);
+        }
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,10 +120,7 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [
-              Color(0xFFF5F7FA),
-              Color(0xFFE8F5E9),
-            ],
+            colors: [Color(0xFFF5F7FA), Color(0xFFE8F5E9)],
           ),
         ),
         child: SafeArea(
@@ -134,6 +159,15 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                 sliver: SliverList(
                   delegate: SliverChildListDelegate([
                     _buildQuickStatsRow(),
+                    const SizedBox(height: 20),
+                    // Insert Pi viewer here; it will push live sensor updates into the dashboard
+                    PiViewer(
+                      onSensor: (t, h) {
+                        if (t != null && h != null) {
+                          _addSensorReading(t, h);
+                        }
+                      },
+                    ),
                     const SizedBox(height: 20),
                     _buildDoorStatusCard(),
                     const SizedBox(height: 20),
@@ -177,7 +211,13 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
     );
   }
 
-  Widget _buildStatCard(String label, String value, IconData icon, Color startColor, Color endColor) {
+  Widget _buildStatCard(
+    String label,
+    String value,
+    IconData icon,
+    Color startColor,
+    Color endColor,
+  ) {
     return Container(
       decoration: BoxDecoration(
         gradient: LinearGradient(
@@ -254,7 +294,10 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFF00C853).withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
@@ -273,13 +316,9 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
             const SizedBox(height: 24),
             Row(
               children: [
-                Expanded(
-                  child: _buildDoorStatus(),
-                ),
+                Expanded(child: _buildDoorStatus()),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: _buildDoorActivity(),
-                ),
+                Expanded(child: _buildDoorActivity()),
               ],
             ),
           ],
@@ -300,14 +339,18 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
               gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: isDoorOpen 
-                  ? [const Color(0xFFFF6B6B), const Color(0xFFFF8E53)]
-                  : [const Color(0xFF00C853), const Color(0xFF00E676)],
+                colors: isDoorOpen
+                    ? [const Color(0xFFFF6B6B), const Color(0xFFFF8E53)]
+                    : [const Color(0xFF00C853), const Color(0xFF00E676)],
               ),
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: (isDoorOpen ? const Color(0xFFFF6B6B) : const Color(0xFF00C853)).withOpacity(0.3),
+                  color:
+                      (isDoorOpen
+                              ? const Color(0xFFFF6B6B)
+                              : const Color(0xFF00C853))
+                          .withOpacity(0.3),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -416,7 +459,11 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.thermostat, color: Colors.white, size: 24),
+                  child: const Icon(
+                    Icons.thermostat,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -432,10 +479,7 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
             const SizedBox(height: 8),
             Text(
               'Over Time',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -487,8 +531,12 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                         },
                       ),
                     ),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                   ),
                   borderData: FlBorderData(show: false),
                   minX: 0,
@@ -565,7 +613,11 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                     ),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Icon(Icons.water_drop, color: Colors.white, size: 24),
+                  child: const Icon(
+                    Icons.water_drop,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Text(
@@ -581,10 +633,7 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
             const SizedBox(height: 8),
             Text(
               'Over Time',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-              ),
+              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
             ),
             const SizedBox(height: 24),
             SizedBox(
@@ -636,8 +685,12 @@ class _DashboardPageState extends State<DashboardPage> with TickerProviderStateM
                         },
                       ),
                     ),
-                    topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                    rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
+                    rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false),
+                    ),
                   ),
                   borderData: FlBorderData(show: false),
                   minX: 0,
