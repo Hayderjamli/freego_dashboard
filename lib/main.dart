@@ -5,6 +5,7 @@ import 'package:mobile_app_dashboard/welcome_page.dart';
 import 'package:mobile_app_dashboard/settings_page.dart';
 import 'package:mobile_app_dashboard/notifications_page.dart';
 import 'package:mobile_app_dashboard/notification_service.dart';
+import 'package:mobile_app_dashboard/pi_monitor_page.dart';
 import 'firebase_options.dart';
 
 class AppPalette {
@@ -30,18 +31,17 @@ class AppPalette {
     end: Alignment.bottomRight,
   );
 
-  static final LinearGradient energyGradient = const LinearGradient(
-    colors: [neonPink, vibrantOrange, energyYellow],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
+static final LinearGradient energyGradient = const LinearGradient(
+  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
 
-  static final LinearGradient sportGradient = const LinearGradient(
-    colors: [electricBlue, sportGreen],
-    begin: Alignment.topLeft,
-    end: Alignment.bottomRight,
-  );
-
+static final LinearGradient sportGradient = const LinearGradient(
+  colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
+  begin: Alignment.topLeft,
+  end: Alignment.bottomRight,
+);
   static final LinearGradient purpleGradient = const LinearGradient(
     colors: [richPurple, Color(0xFF5E3FBE)],
     begin: Alignment.topLeft,
@@ -206,6 +206,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             OverviewPage(data: data, settings: settings),
             DashboardPage(data: data),
+            const PiMonitorPage(),
             SettingsPage(settings: settings),
           ],
         ),
@@ -238,6 +239,11 @@ class _HomePageState extends State<HomePage> {
                 icon: Icon(Icons.analytics_outlined),
                 activeIcon: Icon(Icons.analytics),
                 label: 'ANALYTICS',
+              ),
+              const BottomNavigationBarItem(
+                icon: Icon(Icons.videocam_outlined),
+                activeIcon: Icon(Icons.videocam),
+                label: 'LIVE MONITOR',
               ),
               BottomNavigationBarItem(
                 icon: Stack(

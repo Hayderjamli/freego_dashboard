@@ -1,0 +1,5 @@
+flask>=2.2.0
+websockets>=11.0
+adafruit-circuitpython-dht>=3.5.0
+opencv-python>=4.7.0
+numpy>=1.23.0
