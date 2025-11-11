@@ -38,7 +38,7 @@ static final LinearGradient energyGradient = const LinearGradient(
 );
 
 static final LinearGradient sportGradient = const LinearGradient(
-  colors: [Color(0xFF4facfe), Color(0xFF00f2fe)],
+  colors: [Color.fromARGB(255, 11, 24, 102), Color(0xFF26d0ce)],
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
 );
