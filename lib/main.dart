@@ -6,6 +6,7 @@ import 'package:mobile_app_dashboard/settings_page.dart';
 import 'package:mobile_app_dashboard/notifications_page.dart';
 import 'package:mobile_app_dashboard/notification_service.dart';
 import 'package:mobile_app_dashboard/pi_monitor_page.dart';
+import 'package:mobile_app_dashboard/pi_viewer.dart';
 import 'firebase_options.dart';
 
 class AppPalette {
@@ -138,16 +139,67 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedIndex = 0;
   final PageController _pageController = PageController();
-  late final DashboardData data = DashboardData.sample();
+  late DashboardData data;
   final ThresholdSettings settings = ThresholdSettings();
   final NotificationService notificationService = NotificationService();
+  
+  // Sensor data lists to track incoming data
+  final List<SensorReading> temperatureReadings = [];
+  final List<SensorReading> humidityReadings = [];
 
   @override
   void initState() {
     super.initState();
+    data = DashboardData(
+      temperatureReadings: temperatureReadings,
+      humidityReadings: humidityReadings,
+      doorCycles: const [
+        DoorCycleStat(label: 'Matin', openings: 5, closures: 5),
+        DoorCycleStat(label: 'Midi', openings: 7, closures: 6),
+        DoorCycleStat(label: 'Après-midi', openings: 4, closures: 5),
+        DoorCycleStat(label: 'Soir', openings: 6, closures: 6),
+      ],
+      doorStatus: DoorStatus.closed,
+      lastUpdated: DateTime.now(),
+    );
     // Check thresholds periodically (demo)
     Future.delayed(const Duration(seconds: 5), () {
       _checkThresholds();
+    });
+  }
+
+  void _addSensorReading(double? temperature, double? humidity) {
+    if (!mounted) return;
+
+    setState(() {
+      // Add temperature reading (keep last 7 readings for 7-point chart)
+      if (temperature != null) {
+        final tempLabel = 'T${temperatureReadings.length}';
+        temperatureReadings.add(
+          SensorReading(label: tempLabel, value: temperature),
+        );
+        if (temperatureReadings.length > 7) {
+          temperatureReadings.removeAt(0);
+        }
+      }
+
+      // Add humidity reading (keep last 7 readings for 7-point chart)
+      if (humidity != null) {
+        final humLabel = 'H${humidityReadings.length}';
+        humidityReadings.add(SensorReading(label: humLabel, value: humidity));
+        if (humidityReadings.length > 7) {
+          humidityReadings.removeAt(0);
+        }
+      }
+
+      // Update the data object
+      data = DashboardData(
+        temperatureReadings: temperatureReadings,
+        humidityReadings: humidityReadings,
+        doorCycles: data.doorCycles,
+        doorStatus: data.doorStatus,
+        lastUpdated: DateTime.now(),
+      );
     });
   }
 
@@ -206,7 +258,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             OverviewPage(data: data, settings: settings),
             DashboardPage(data: data),
-            const PiMonitorPage(),
+            PiMonitorPage(onSensor: _addSensorReading),
             SettingsPage(settings: settings),
           ],
         ),

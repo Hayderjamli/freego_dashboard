@@ -3,8 +3,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:web_socket_channel/io.dart';
-import 'package:web_socket_channel/status.dart' as status;
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class SensorReading {
   SensorReading({required this.timestamp, required this.temperature, required this.humidity});
@@ -15,16 +14,19 @@ class SensorReading {
 }
 
 class PiMonitorPage extends StatefulWidget {
-  const PiMonitorPage({super.key});
+  final void Function(double? temperature, double? humidity)? onSensor;
+
+  const PiMonitorPage({super.key, this.onSensor});
 
   @override
   State<PiMonitorPage> createState() => _PiMonitorPageState();
 }
 
 class _PiMonitorPageState extends State<PiMonitorPage> {
-  final TextEditingController _endpointController = TextEditingController(text: 'ws://192.168.1.10:8000');
+  // Hardcoded WebSocket endpoint (per project requirement)
+  static const String _wsEndpoint = 'ws://192.168.137.104:8000';
   final List<SensorReading> _history = <SensorReading>[];
-  IOWebSocketChannel? _channel;
+  WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
   Uint8List? _latestFrame;
   bool _isConnecting = false;
@@ -32,41 +34,61 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
   String? _statusMessage;
 
   @override
+  void initState() {
+    super.initState();
+    // Auto-connect when the page loads
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _connect();
+    });
+  }
+
+  @override
   void dispose() {
     _subscription?.cancel();
-    _channel?.sink.close(status.goingAway);
-    _endpointController.dispose();
+    _channel?.sink.close();
     super.dispose();
   }
 
   Future<void> _connect() async {
-    if (_endpointController.text.isEmpty) {
-      setState(() => _statusMessage = 'Enter the WebSocket endpoint first.');
-      return;
-    }
     await _disconnect();
     setState(() {
       _isConnecting = true;
       _statusMessage = 'Connecting...';
     });
     try {
-      final uri = Uri.parse(_endpointController.text.trim());
-      final channel = IOWebSocketChannel.connect(uri);
+      final uri = Uri.parse(_wsEndpoint);
+      final channel = WebSocketChannel.connect(uri);
       _subscription = channel.stream.listen(
         _handleMessage,
         onDone: () {
-          setState(() {
-            _statusMessage = 'Connection closed.';
-            _streaming = false;
-            _channel = null;
-          });
+          if (mounted) {
+            setState(() {
+              _statusMessage = 'Connection closed. Reconnecting...';
+              _streaming = false;
+              _channel = null;
+            });
+            // Auto-reconnect after 3 seconds
+            Future.delayed(const Duration(seconds: 3), () {
+              if (mounted) {
+                _connect();
+              }
+            });
+          }
         },
         onError: (error) {
-          setState(() {
-            _statusMessage = 'Connection error: $error';
-            _streaming = false;
-            _channel = null;
-          });
+          if (mounted) {
+            setState(() {
+              _statusMessage = 'Connection error: $error. Reconnecting...';
+              _streaming = false;
+              _channel = null;
+            });
+            // Auto-reconnect after 3 seconds
+            Future.delayed(const Duration(seconds: 3), () {
+              if (mounted) {
+                _connect();
+              }
+            });
+          }
         },
       );
       setState(() {
@@ -75,9 +97,15 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
       });
     } catch (error) {
       setState(() {
-        _statusMessage = 'Failed to connect: $error';
+        _statusMessage = 'Failed to connect: $error. Reconnecting...';
         _streaming = false;
         _channel = null;
+      });
+      // Auto-reconnect after 3 seconds
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) {
+          _connect();
+        }
       });
     } finally {
       setState(() => _isConnecting = false);
@@ -87,7 +115,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
   Future<void> _disconnect() async {
     _subscription?.cancel();
     _subscription = null;
-    await _channel?.sink.close(status.normalClosure);
+    await _channel?.sink.close();
     setState(() {
       _channel = null;
       _streaming = false;
@@ -103,10 +131,12 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
       final payload = jsonDecode(data) as Map<String, dynamic>;
       switch (payload['type']) {
         case 'sensor':
+          final temperature = (payload['temperature'] as num?)?.toDouble();
+          final humidity = (payload['humidity'] as num?)?.toDouble();
           final reading = SensorReading(
             timestamp: payload['time']?.toString() ?? '--:--:--',
-            temperature: (payload['temperature'] as num?)?.toDouble() ?? double.nan,
-            humidity: (payload['humidity'] as num?)?.toDouble() ?? double.nan,
+            temperature: temperature ?? double.nan,
+            humidity: humidity ?? double.nan,
           );
           setState(() {
             _history.insert(0, reading);
@@ -114,6 +144,8 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
               _history.removeLast();
             }
           });
+          // Call the parent callback to update the dashboard
+          widget.onSensor?.call(temperature, humidity);
           break;
         case 'frame':
           final encoded = payload['data'];
@@ -132,7 +164,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
       setState(() => _statusMessage = 'Connect before starting the stream.');
       return;
     }
-    _channel!.sink.add('START_STREAM:3');
+    _channel!.sink.add('START_STREAM:15');
     setState(() {
       _streaming = true;
       _statusMessage = 'Streaming started.';
@@ -197,7 +229,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
         actions: [
           TextButton(
             onPressed: _channel == null ? (_isConnecting ? null : _connect) : _disconnect,
-            child: Text(_channel == null ? 'CONNECT' : 'DISCONNECT'),
+            child: Text(_channel == null ? 'RECONNECT' : 'DISCONNECT'),
           ),
           const SizedBox(width: 12),
         ],
@@ -229,11 +261,22 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
                   children: [
                     const Text('WebSocket Endpoint', style: TextStyle(fontWeight: FontWeight.bold)),
                     const SizedBox(height: 8),
-                    TextField(
-                      controller: _endpointController,
-                      decoration: const InputDecoration(
-                        hintText: 'ws://<raspberry-pi-ip>:8000',
-                        filled: true,
+                    // Endpoint is hardcoded to ensure the app always connects
+                    // to the Raspberry Pi at 192.168.137.104:8000
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: Theme.of(
+                            context,
+                          ).colorScheme.outline.withOpacity(0.5),
+                        ),
+                      ),
+                      child: const Text(
+                        _wsEndpoint,
+                        style: TextStyle(fontFamily: 'monospace', fontSize: 12),
                       ),
                     ),
                     const SizedBox(height: 12),
