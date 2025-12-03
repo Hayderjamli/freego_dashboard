@@ -2,55 +2,64 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_dashboard/welcome_page.dart';
-import 'package:mobile_app_dashboard/settings_page.dart';
-import 'package:mobile_app_dashboard/notifications_page.dart';
 import 'package:mobile_app_dashboard/notification_service.dart';
 import 'package:mobile_app_dashboard/pi_monitor_page.dart';
-import 'package:mobile_app_dashboard/pi_viewer.dart';
+import 'package:mobile_app_dashboard/features/dashboard/presentation/widgets/dashboard_home_page.dart';
+import 'package:mobile_app_dashboard/features/charts/charts_page.dart';
+import 'package:mobile_app_dashboard/features/alerts/alerts_page.dart';
+import 'package:mobile_app_dashboard/features/settings/settings_page_new.dart';
+import 'core/theme/app_colors.dart';
+import 'core/theme/app_theme.dart';
+import 'core/constants/models.dart';
 import 'firebase_options.dart';
 
+// ============================================================================
+// LEGACY AppPalette - Kept for backward compatibility with existing pages
+// New pages should use AppColors from core/theme/app_colors.dart
+// ============================================================================
 class AppPalette {
   const AppPalette._();
 
-  // Sporty vibrant colors
-  static const Color darkBg = Color(0xFF0A0E27);
-  static const Color deepPurple = Color(0xFF1A1B3D);
-  static const Color richPurple = Color(0xFF2E3192);
-  static const Color electricBlue = Color(0xFF00D4FF);
-  static const Color neonPink = Color(0xFFFF006E);
-  static const Color vibrantOrange = Color(0xFFFF6B35);
-  static const Color energyYellow = Color(0xFFFFBE0B);
-  static const Color sportGreen = Color(0xFF06FFA5);
-  static const Color cardDark = Color(0xFF1C1E3B);
-  static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFB8B9D4);
-  static const Color textMuted = Color(0xFF7B7D9D);
+  // Mapped to new color scheme for consistency
+  static const Color darkBg = Color(0xFFF7F9FC); // Light background
+  static const Color deepPurple = Color(0xFF2D9CDB); // Primary blue
+  static const Color richPurple = Color(0xFF2D9CDB);
+  static const Color electricBlue = Color(0xFF2D9CDB); // Primary
+  static const Color neonPink = Color(0xFFEB5757); // Danger
+  static const Color vibrantOrange = Color(0xFFF2C94C); // Warning/Accent
+  static const Color energyYellow = Color(0xFFF2C94C);
+  static const Color sportGreen = Color(0xFF27AE60); // Secondary/Success
+  static const Color cardDark = Color(0xFFFFFFFF); // Card surface
+  static const Color textPrimary = Color(0xFF1A1A1A);
+  static const Color textSecondary = Color(0xFF6B7280);
+  static const Color textMuted = Color(0xFF9CA3AF);
 
-  static final LinearGradient backgroundGradient = const LinearGradient(
-    colors: [darkBg, deepPurple],
+  static const LinearGradient backgroundGradient = LinearGradient(
+    colors: [Color(0xFFF7F9FC), Color(0xFFEDF2F7)],
+    begin: Alignment.topCenter,
+    end: Alignment.bottomCenter,
+  );
+
+  static const LinearGradient energyGradient = LinearGradient(
+    colors: [Color(0xFF2D9CDB), Color(0xFF56CCF2)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
-static final LinearGradient energyGradient = const LinearGradient(
-  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
+  static const LinearGradient sportGradient = LinearGradient(
+    colors: [Color(0xFF27AE60), Color(0xFF6FCF97)],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
-static final LinearGradient sportGradient = const LinearGradient(
-  colors: [Color.fromARGB(255, 11, 24, 102), Color(0xFF26d0ce)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
-  static final LinearGradient purpleGradient = const LinearGradient(
-    colors: [richPurple, Color(0xFF5E3FBE)],
+  static const LinearGradient purpleGradient = LinearGradient(
+    colors: [Color(0xFF2D9CDB), Color(0xFF56CCF2)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
 
   static final LinearGradient cardGradient = LinearGradient(
-    colors: [cardDark.withOpacity(0.8), cardDark.withOpacity(0.4)],
+    colors: [Colors.white, Colors.white.withValues(alpha: 0.95)],
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -70,65 +79,19 @@ class DashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'FreeGo',
+      title: 'FreeGo Dashboard',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        brightness: Brightness.dark,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppPalette.electricBlue,
-          brightness: Brightness.dark,
-        ).copyWith(
-          background: AppPalette.darkBg,
-          surface: AppPalette.cardDark,
-          primary: AppPalette.electricBlue,
-          secondary: AppPalette.sportGreen,
-          onPrimary: Colors.white,
-          onSecondary: Colors.black,
-        ),
-        scaffoldBackgroundColor: AppPalette.darkBg,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          centerTitle: false,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 28,
-            fontWeight: FontWeight.w900,
-            letterSpacing: -0.5,
-          ),
-        ),
-        filledButtonTheme: FilledButtonThemeData(
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
-            backgroundColor: AppPalette.electricBlue,
-            foregroundColor: Colors.black,
-            textStyle: const TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.5,
-            ),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            elevation: 8,
-            shadowColor: AppPalette.electricBlue.withOpacity(0.5),
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white, size: 24),
-        textTheme: ThemeData(
-          brightness: Brightness.dark,
-        ).textTheme.apply(
-          bodyColor: Colors.white,
-          displayColor: Colors.white,
-          fontFamily: 'Roboto',
-        ),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light,
       home: const WelcomePage(),
     );
   }
 }
 
+// ============================================================================
+// HomePage - Main Navigation Hub
+// ============================================================================
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -154,15 +117,15 @@ class _HomePageState extends State<HomePage> {
       temperatureReadings: temperatureReadings,
       humidityReadings: humidityReadings,
       doorCycles: const [
-        DoorCycleStat(label: 'Matin', openings: 5, closures: 5),
-        DoorCycleStat(label: 'Midi', openings: 7, closures: 6),
-        DoorCycleStat(label: 'Après-midi', openings: 4, closures: 5),
-        DoorCycleStat(label: 'Soir', openings: 6, closures: 6),
+        DoorCycleStat(label: 'Morning', openings: 5, closures: 5),
+        DoorCycleStat(label: 'Noon', openings: 7, closures: 6),
+        DoorCycleStat(label: 'Afternoon', openings: 4, closures: 5),
+        DoorCycleStat(label: 'Evening', openings: 6, closures: 6),
       ],
       doorStatus: DoorStatus.closed,
       lastUpdated: DateTime.now(),
     );
-    // Check thresholds periodically (demo)
+    // Check thresholds periodically
     Future.delayed(const Duration(seconds: 5), () {
       _checkThresholds();
     });
@@ -172,7 +135,7 @@ class _HomePageState extends State<HomePage> {
     if (!mounted) return;
 
     setState(() {
-      // Add temperature reading (keep last 7 readings for 7-point chart)
+      // Add temperature reading (keep last 7 readings for chart)
       if (temperature != null) {
         final tempLabel = 'T${temperatureReadings.length}';
         temperatureReadings.add(
@@ -183,7 +146,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
 
-      // Add humidity reading (keep last 7 readings for 7-point chart)
+      // Add humidity reading (keep last 7 readings for chart)
       if (humidity != null) {
         final humLabel = 'H${humidityReadings.length}';
         humidityReadings.add(SensorReading(label: humLabel, value: humidity));
@@ -218,11 +181,11 @@ class _HomePageState extends State<HomePage> {
       currentTemp: latestTemp,
       currentHumidity: latestHumidity,
       isDoorOpen: isDoorOpen,
-      doorOpenMinutes: 6, // Demo: door has been open for 6 minutes
+      doorOpenMinutes: 6,
       settings: settings,
     );
 
-    setState(() {}); // Refresh to show notification badge
+    setState(() {});
   }
 
   void _onItemTapped(int index) {
@@ -244,116 +207,117 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: (index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+        children: [
+          DashboardHomePage(data: data, settings: settings),
+          ChartsPage(data: data),
+          PiMonitorPage(onSensor: _addSensorReading),
+          AlertsPage(),
+          SettingsPageNew(settings: settings),
+        ],
+      ),
+      bottomNavigationBar: _buildBottomNav(),
+    );
+  }
+
+  Widget _buildBottomNav() {
     return Container(
-      decoration: BoxDecoration(gradient: AppPalette.backgroundGradient),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: PageView(
-          controller: _pageController,
-          onPageChanged: (index) {
-            setState(() {
-              _selectedIndex = index;
-            });
-          },
-          children: [
-            OverviewPage(data: data, settings: settings),
-            DashboardPage(data: data),
-            PiMonitorPage(onSensor: _addSensorReading),
-            SettingsPage(settings: settings),
-          ],
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildNavItem(0, Icons.dashboard_rounded, Icons.dashboard_outlined, 'Dashboard'),
+              _buildNavItem(1, Icons.show_chart_rounded, Icons.show_chart_outlined, 'Charts'),
+              _buildNavItem(2, Icons.videocam_rounded, Icons.videocam_outlined, 'Live'),
+              _buildNavItem(3, Icons.notifications_rounded, Icons.notifications_outlined, 'Alerts', badge: notificationService.unreadCount),
+              _buildNavItem(4, Icons.settings_rounded, Icons.settings_outlined, 'Settings'),
+            ],
+          ),
         ),
-        bottomNavigationBar: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [
-                AppPalette.cardDark.withOpacity(0.95),
-                AppPalette.deepPurple.withOpacity(0.95),
-              ],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: AppPalette.electricBlue.withOpacity(0.1),
-                blurRadius: 20,
-                offset: const Offset(0, -4),
-              ),
-            ],
-          ),
-          child: BottomNavigationBar(
-            items: <BottomNavigationBarItem>[
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.dashboard_rounded),
-                activeIcon: Icon(Icons.dashboard),
-                label: 'DASHBOARD',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.analytics_outlined),
-                activeIcon: Icon(Icons.analytics),
-                label: 'ANALYTICS',
-              ),
-              const BottomNavigationBarItem(
-                icon: Icon(Icons.videocam_outlined),
-                activeIcon: Icon(Icons.videocam),
-                label: 'LIVE MONITOR',
-              ),
-              BottomNavigationBarItem(
-                icon: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    const Icon(Icons.settings_outlined),
-                    if (notificationService.unreadCount > 0)
-                      Positioned(
-                        right: -6,
-                        top: -4,
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: AppPalette.neonPink,
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: AppPalette.neonPink.withOpacity(0.6),
-                                blurRadius: 8,
-                                spreadRadius: 2,
-                              ),
-                            ],
-                          ),
-                          constraints: const BoxConstraints(
-                            minWidth: 18,
-                            minHeight: 18,
-                          ),
-                          child: Text(
-                            notificationService.unreadCount > 9 
-                                ? '9+' 
-                                : '${notificationService.unreadCount}',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w900,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ],
+      ),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData activeIcon, IconData inactiveIcon, String label, {int badge = 0}) {
+    final isSelected = _selectedIndex == index;
+    
+    return InkWell(
+      onTap: () => _onItemTapped(index),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Icon(
+                  isSelected ? activeIcon : inactiveIcon,
+                  color: isSelected ? AppColors.primary : AppColors.textMuted,
+                  size: 24,
                 ),
-                activeIcon: const Icon(Icons.settings),
-                label: 'SETTINGS',
+                if (badge > 0)
+                  Positioned(
+                    right: -8,
+                    top: -4,
+                    child: Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        color: AppColors.danger,
+                        shape: BoxShape.circle,
+                      ),
+                      constraints: const BoxConstraints(
+                        minWidth: 16,
+                        minHeight: 16,
+                      ),
+                      child: Text(
+                        badge > 9 ? '9+' : '$badge',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 9,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? AppColors.primary : AppColors.textMuted,
               ),
-            ],
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            backgroundColor: Colors.transparent,
-            selectedItemColor: AppPalette.electricBlue,
-            unselectedItemColor: AppPalette.textMuted,
-            type: BottomNavigationBarType.fixed,
-            selectedFontSize: 12,
-            unselectedFontSize: 11,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 1.2),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-            elevation: 0,
-          ),
+            ),
+          ],
         ),
       ),
     );

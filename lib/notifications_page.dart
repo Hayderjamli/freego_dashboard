@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'notification_service.dart';
+import 'package:mobile_app_dashboard/notification_service.dart';
+import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
+import 'package:mobile_app_dashboard/core/constants/models.dart';
 import 'main.dart';
 
 class NotificationsPage extends StatefulWidget {
@@ -17,16 +19,18 @@ class _NotificationsPageState extends State<NotificationsPage> {
     final notifications = _notificationService.notifications;
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: ShaderMask(
-          shaderCallback: (bounds) => AppPalette.energyGradient.createShader(bounds),
-          child: const Text(
-            'NOTIFICATIONS',
-            style: TextStyle(color: Colors.white),
+        title: Text(
+          'Notifications',
+          style: TextStyle(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w600,
           ),
         ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.textDark),
         actions: [
           if (notifications.isNotEmpty)
             IconButton(

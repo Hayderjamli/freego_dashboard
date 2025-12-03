@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'settings_page.dart';
-import 'main.dart';
+import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
+import 'package:mobile_app_dashboard/core/constants/models.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -27,7 +27,7 @@ class NotificationService {
       _addNotification(AlertNotification(
         id: 'temp_low_${now.millisecondsSinceEpoch}',
         type: AlertType.temperatureLow,
-        title: 'LOW TEMPERATURE ALERT',
+        title: 'Low Temperature Alert',
         message: 'Temperature dropped to ${currentTemp.toStringAsFixed(1)}°C (Min: ${settings.minTemperature.toStringAsFixed(1)}°C)',
         timestamp: now,
         value: currentTemp,
@@ -39,7 +39,7 @@ class NotificationService {
       _addNotification(AlertNotification(
         id: 'temp_high_${now.millisecondsSinceEpoch}',
         type: AlertType.temperatureHigh,
-        title: 'HIGH TEMPERATURE ALERT',
+        title: 'High Temperature Alert',
         message: 'Temperature rose to ${currentTemp.toStringAsFixed(1)}°C (Max: ${settings.maxTemperature.toStringAsFixed(1)}°C)',
         timestamp: now,
         value: currentTemp,
@@ -52,7 +52,7 @@ class NotificationService {
       _addNotification(AlertNotification(
         id: 'humidity_low_${now.millisecondsSinceEpoch}',
         type: AlertType.humidityLow,
-        title: 'LOW HUMIDITY ALERT',
+        title: 'Low Humidity Alert',
         message: 'Humidity dropped to ${currentHumidity.toStringAsFixed(0)}% (Min: ${settings.minHumidity.toStringAsFixed(0)}%)',
         timestamp: now,
         value: currentHumidity,
@@ -64,7 +64,7 @@ class NotificationService {
       _addNotification(AlertNotification(
         id: 'humidity_high_${now.millisecondsSinceEpoch}',
         type: AlertType.humidityHigh,
-        title: 'HIGH HUMIDITY ALERT',
+        title: 'High Humidity Alert',
         message: 'Humidity rose to ${currentHumidity.toStringAsFixed(0)}% (Max: ${settings.maxHumidity.toStringAsFixed(0)}%)',
         timestamp: now,
         value: currentHumidity,
@@ -77,7 +77,7 @@ class NotificationService {
       _addNotification(AlertNotification(
         id: 'door_open_${now.millisecondsSinceEpoch}',
         type: AlertType.doorOpenTooLong,
-        title: 'DOOR OPEN ALERT',
+        title: 'Door Open Alert',
         message: 'Door has been open for $doorOpenMinutes minutes (Max: ${settings.maxDoorOpenMinutes} min)',
         timestamp: now,
         value: doorOpenMinutes.toDouble(),
@@ -123,73 +123,5 @@ class NotificationService {
     for (var notification in _notifications) {
       notification.isRead = true;
     }
-  }
-}
-
-enum AlertType {
-  temperatureLow,
-  temperatureHigh,
-  humidityLow,
-  humidityHigh,
-  doorOpenTooLong,
-}
-
-class AlertNotification {
-  final String id;
-  final AlertType type;
-  final String title;
-  final String message;
-  final DateTime timestamp;
-  final double value;
-  final double threshold;
-  bool isRead;
-
-  AlertNotification({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.message,
-    required this.timestamp,
-    required this.value,
-    required this.threshold,
-    this.isRead = false,
-  });
-
-  IconData get icon {
-    switch (type) {
-      case AlertType.temperatureLow:
-        return Icons.ac_unit_rounded;
-      case AlertType.temperatureHigh:
-        return Icons.local_fire_department_rounded;
-      case AlertType.humidityLow:
-        return Icons.dry_rounded;
-      case AlertType.humidityHigh:
-        return Icons.water_rounded;
-      case AlertType.doorOpenTooLong:
-        return Icons.sensor_door_rounded;
-    }
-  }
-
-  Color get color {
-    switch (type) {
-      case AlertType.temperatureLow:
-        return AppPalette.electricBlue;
-      case AlertType.temperatureHigh:
-        return AppPalette.vibrantOrange;
-      case AlertType.humidityLow:
-        return AppPalette.energyYellow;
-      case AlertType.humidityHigh:
-        return AppPalette.sportGreen;
-      case AlertType.doorOpenTooLong:
-        return AppPalette.neonPink;
-    }
-  }
-
-  String get timeAgo {
-    final diff = DateTime.now().difference(timestamp);
-    if (diff.inMinutes < 1) return 'Just now';
-    if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
-    if (diff.inHours < 24) return '${diff.inHours}h ago';
-    return '${diff.inDays}d ago';
   }
 }
