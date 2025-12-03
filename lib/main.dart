@@ -29,6 +29,7 @@ class AppPalette {
 
   // Logo-specific colors
   static const Color logoNavy = Color(0xFF2E4057);          // Navy blue from FreeGo text
+  static const Color logoNavyLight = Color(0xFF3D5A80);     // Lighter navy for gradients
   static const Color logoCyan = Color(0xFF4ECDC4);          // Cyan from leaf
   static const Color logoLeafLight = Color(0xFF7EDCE2);     // Light cyan leaf
 
@@ -986,8 +987,8 @@ class FreeGoLogo extends StatelessWidget {
     // Use logo colors - navy blue text with cyan leaves
     final textGradient = LinearGradient(
       colors: [
-        Color.lerp(AppPalette.logoNavy, const Color(0xFF3D5A80), animationValue)!,
-        Color.lerp(const Color(0xFF3D5A80), AppPalette.logoNavy, animationValue)!,
+        Color.lerp(AppPalette.logoNavy, AppPalette.logoNavyLight, animationValue)!,
+        Color.lerp(AppPalette.logoNavyLight, AppPalette.logoNavy, animationValue)!,
       ],
       begin: Alignment.topCenter,
       end: Alignment.bottomCenter,
@@ -1122,7 +1123,7 @@ class FreeGoLogo extends StatelessWidget {
               width: size * 0.06,
               height: size * 0.25,
               decoration: BoxDecoration(
-                color: const Color(0xFF6BBF59),
+                color: AppPalette.sportGreen,
                 borderRadius: BorderRadius.circular(size * 0.03),
               ),
             ),
