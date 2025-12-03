@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app_dashboard/auth_service.dart';
-import 'package:mobile_app_dashboard/main.dart'; // For HomePage
+import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
+import 'package:mobile_app_dashboard/main.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -15,171 +16,187 @@ class _SignUpPageState extends State<SignUpPage> {
   String email = '';
   String password = '';
   String error = '';
+  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: ShaderMask(
-          shaderCallback: (bounds) => AppPalette.energyGradient.createShader(bounds),
-          child: const Text(
-            'CREATE ACCOUNT',
-            style: TextStyle(color: Colors.white),
+        title: Text(
+          'Create Account',
+          style: TextStyle(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w600,
           ),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppPalette.electricBlue),
+        iconTheme: IconThemeData(color: AppColors.textDark),
       ),
-      body: Container(
-        decoration: BoxDecoration(gradient: AppPalette.backgroundGradient),
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 40.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: <Widget>[
-                    const AnimatedFreeGoLogo(size: 50),
-                    const SizedBox(height: 40.0),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: AppPalette.purpleGradient,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: AppPalette.electricBlue.withOpacity(0.3),
-                          width: 2,
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: <Widget>[
+                  // Logo
+                  Container(
+                    width: 72,
+                    height: 72,
+                    margin: const EdgeInsets.only(bottom: 32),
+                    decoration: BoxDecoration(
+                      gradient: AppColors.successGradient,
+                      borderRadius: BorderRadius.circular(18),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.secondary.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppPalette.richPurple.withOpacity(0.4),
-                            blurRadius: 30,
-                            offset: const Offset(0, 15),
-                          ),
-                        ],
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.person_add_rounded,
+                        color: Colors.white,
+                        size: 36,
                       ),
-                      padding: const EdgeInsets.all(24),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                            decoration: InputDecoration(
-                              hintText: 'Email',
-                              hintStyle: TextStyle(color: AppPalette.textMuted),
-                              filled: true,
-                              fillColor: AppPalette.cardDark.withOpacity(0.6),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: AppPalette.electricBlue, width: 2),
-                              ),
-                              prefixIcon: const Icon(Icons.email_rounded, color: AppPalette.electricBlue),
+                    ),
+                  ),
+                  
+                  // Form Card
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        TextFormField(
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            prefixIcon: Icon(
+                              Icons.email_outlined,
+                              color: AppColors.textSecondary,
                             ),
-                            validator: (val) => val!.isEmpty ? 'Enter an email' : null,
-                            onChanged: (val) {
-                              setState(() => email = val);
-                            },
                           ),
-                          const SizedBox(height: 20.0),
-                          TextFormField(
-                            obscureText: true,
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
-                            decoration: InputDecoration(
-                              hintText: 'Password',
-                              hintStyle: TextStyle(color: AppPalette.textMuted),
-                              filled: true,
-                              fillColor: AppPalette.cardDark.withOpacity(0.6),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide.none,
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(16),
-                                borderSide: BorderSide(color: AppPalette.sportGreen, width: 2),
-                              ),
-                              prefixIcon: const Icon(Icons.lock_rounded, color: AppPalette.sportGreen),
+                          keyboardType: TextInputType.emailAddress,
+                          validator: (val) => val!.isEmpty ? 'Enter an email' : null,
+                          onChanged: (val) {
+                            setState(() => email = val);
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                          obscureText: true,
+                          decoration: InputDecoration(
+                            labelText: 'Password',
+                            prefixIcon: Icon(
+                              Icons.lock_outline_rounded,
+                              color: AppColors.textSecondary,
                             ),
-                            validator: (val) => val!.length < 6 ? 'Enter a password 6+ chars long' : null,
-                            onChanged: (val) {
-                              setState(() => password = val);
-                            },
                           ),
-                          const SizedBox(height: 28.0),
-                          Container(
-                            width: double.infinity,
-                            height: 56,
-                            decoration: BoxDecoration(
-                              gradient: AppPalette.energyGradient,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppPalette.vibrantOrange.withOpacity(0.5),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 8),
-                                ),
-                              ],
-                            ),
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.transparent,
-                                shadowColor: Colors.transparent,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                              ),
-                              child: const Text(
-                                'SIGN UP',
-                                style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.w900,
-                                  letterSpacing: 1.5,
-                                ),
-                              ),
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  dynamic result = await _auth.registerWithEmailAndPassword(email, password);
-                                  if (result == null) {
-                                    setState(() => error = 'Please supply a valid email');
-                                  } else {
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const HomePage()),
-                                      (Route<dynamic> route) => false,
-                                    );
-                                  }
+                          validator: (val) => val!.length < 6 ? 'Password must be 6+ characters' : null,
+                          onChanged: (val) {
+                            setState(() => password = val);
+                          },
+                        ),
+                        const SizedBox(height: 24),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : () async {
+                              if (_formKey.currentState!.validate()) {
+                                setState(() => _isLoading = true);
+                                dynamic result = await _auth.registerWithEmailAndPassword(email, password);
+                                setState(() => _isLoading = false);
+                                if (result == null) {
+                                  setState(() => error = 'Please supply a valid email');
+                                } else {
+                                  Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HomePage()),
+                                    (Route<dynamic> route) => false,
+                                  );
                                 }
-                              },
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.secondary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: _isLoading
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                    ),
+                                  )
+                                : const Text(
+                                    'Create Account',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  if (error.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.danger.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: AppColors.danger.withValues(alpha: 0.3),
+                        ),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            color: AppColors.danger,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              error,
+                              style: TextStyle(
+                                color: AppColors.danger,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 16.0),
-                    if (error.isNotEmpty)
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: AppPalette.neonPink.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppPalette.neonPink.withOpacity(0.5)),
-                        ),
-                        child: Text(
-                          error,
-                          style: const TextStyle(
-                            color: AppPalette.neonPink,
-                            fontSize: 14.0,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
                   ],
-                ),
+                ],
               ),
             ),
           ),

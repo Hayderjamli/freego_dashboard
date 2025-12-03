@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
 import 'main.dart';
 
+/// Legacy ThresholdSettings class - kept for backward compatibility
+/// New code should use ThresholdSettings from core/constants/models.dart
 class ThresholdSettings {
   double minTemperature;
   double maxTemperature;

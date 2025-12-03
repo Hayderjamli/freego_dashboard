@@ -4,9 +4,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
 
-class SensorReading {
-  SensorReading({required this.timestamp, required this.temperature, required this.humidity});
+/// Internal sensor reading model for WebSocket data
+class _SensorReading {
+  __SensorReading({required this.timestamp, required this.temperature, required this.humidity});
 
   final String timestamp;
   final double temperature;
@@ -25,7 +27,7 @@ class PiMonitorPage extends StatefulWidget {
 class _PiMonitorPageState extends State<PiMonitorPage> {
   // Hardcoded WebSocket endpoint (per project requirement)
   static const String _wsEndpoint = 'ws://192.168.137.104:8000';
-  final List<SensorReading> _history = <SensorReading>[];
+  final List<_SensorReading> _history = <_SensorReading>[];
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;
   Uint8List? _latestFrame;
@@ -133,7 +135,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
         case 'sensor':
           final temperature = (payload['temperature'] as num?)?.toDouble();
           final humidity = (payload['humidity'] as num?)?.toDouble();
-          final reading = SensorReading(
+          final reading = _SensorReading(
             timestamp: payload['time']?.toString() ?? '--:--:--',
             temperature: temperature ?? double.nan,
             humidity: humidity ?? double.nan,
@@ -184,7 +186,24 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
 
   Widget _buildSensorCards() {
     if (_history.isEmpty) {
-      return const Center(child: Text('Waiting for sensor data...'));
+      return Center(
+        child: Column(
+          children: [
+            Icon(
+              Icons.sensors_off_rounded,
+              size: 40,
+              color: AppColors.textMuted,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Waiting for sensor data...',
+              style: TextStyle(
+                color: AppColors.textMuted,
+              ),
+            ),
+          ],
+        ),
+      );
     }
     final latest = _history.first;
     return Column(
@@ -196,27 +215,50 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
             Expanded(child: _SensorStatCard(title: 'Humidity', value: latest.humidity, unit: '%')),
           ],
         ),
-        const SizedBox(height: 20),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface.withOpacity(0.6),
-            borderRadius: BorderRadius.circular(20),
+        if (_history.length > 1) ...[
+          const SizedBox(height: 16),
+          Text(
+            'Recent Readings',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+              fontSize: 14,
+            ),
           ),
-          child: ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _history.length,
-            separatorBuilder: (_, __) => const Divider(height: 0),
-            itemBuilder: (context, index) {
-              final reading = _history[index];
-              return ListTile(
-                title: Text('${reading.temperature.toStringAsFixed(1)} °C'),
-                subtitle: Text('${reading.humidity.toStringAsFixed(1)} %'),
-                trailing: Text(reading.timestamp),
-              );
-            },
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _history.length > 5 ? 5 : _history.length,
+              separatorBuilder: (_, __) => Divider(height: 1, color: AppColors.surface),
+              itemBuilder: (context, index) {
+                final reading = _history[index];
+                return ListTile(
+                  dense: true,
+                  title: Text(
+                    '${reading.temperature.toStringAsFixed(1)}°C  •  ${reading.humidity.toStringAsFixed(1)}%',
+                    style: TextStyle(
+                      color: AppColors.textDark,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  trailing: Text(
+                    reading.timestamp,
+                    style: TextStyle(
+                      color: AppColors.textMuted,
+                      fontSize: 12,
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ],
     );
   }
@@ -224,132 +266,327 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Live Pi Monitor'),
+        title: Text(
+          'Live Monitor',
+          style: TextStyle(
+            color: AppColors.textDark,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        iconTheme: IconThemeData(color: AppColors.textDark),
         actions: [
           TextButton(
             onPressed: _channel == null ? (_isConnecting ? null : _connect) : _disconnect,
+            style: TextButton.styleFrom(
+              foregroundColor: _channel == null ? AppColors.primary : AppColors.danger,
+            ),
             child: Text(_channel == null ? 'RECONNECT' : 'DISCONNECT'),
           ),
           const SizedBox(width: 12),
         ],
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Theme.of(context).colorScheme.background,
-              Theme.of(context).colorScheme.surface,
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    const Text('WebSocket Endpoint', style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 8),
-                    // Endpoint is hardcoded to ensure the app always connects
-                    // to the Raspberry Pi at 192.168.137.104:8000
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(
-                          color: Theme.of(
-                            context,
-                          ).colorScheme.outline.withOpacity(0.5),
-                        ),
-                      ),
-                      child: const Text(
-                        _wsEndpoint,
-                        style: TextStyle(fontFamily: 'monospace', fontSize: 12),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    if (_statusMessage != null)
-                      Text(
-                        _statusMessage!,
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                  ],
-                ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            // Connection Status Card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: FilledButton.icon(
-                            onPressed: _streaming ? null : _startStreaming,
-                            icon: const Icon(Icons.play_arrow),
-                            label: const Text('Start Stream'),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: FilledButton.icon(
-                            onPressed: _streaming ? _stopStreaming : null,
-                            icon: const Icon(Icons.stop),
-                            label: const Text('Stop Stream'),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    AspectRatio(
-                      aspectRatio: 4 / 3,
-                      child: Container(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.black,
-                          borderRadius: BorderRadius.circular(16),
+                          color: (_channel != null ? AppColors.secondary : AppColors.textMuted).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                        child: _latestFrame == null
-                            ? const Center(child: Text('No frame yet', style: TextStyle(color: Colors.white54)))
-                            : ClipRRect(
-                                borderRadius: BorderRadius.circular(16),
-                                child: Image.memory(
-                                  _latestFrame!,
-                                  gaplessPlayback: true,
-                                  fit: BoxFit.cover,
+                        child: Icon(
+                          Icons.wifi_rounded,
+                          color: _channel != null ? AppColors.secondary : AppColors.textMuted,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'WebSocket Connection',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            Text(
+                              _wsEndpoint,
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: AppColors.textSecondary,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: (_channel != null ? AppColors.secondary : AppColors.textMuted).withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                color: _channel != null ? AppColors.secondary : AppColors.textMuted,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              _channel != null ? 'Connected' : 'Disconnected',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: _channel != null ? AppColors.secondary : AppColors.textMuted,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (_statusMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _statusMessage!,
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+            
+            // Camera Stream Card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.videocam_rounded,
+                          color: AppColors.primary,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Camera Feed',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const Spacer(),
+                      if (_streaming)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.danger.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Container(
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: AppColors.danger,
+                                  shape: BoxShape.circle,
                                 ),
                               ),
+                              const SizedBox(width: 4),
+                              Text(
+                                'LIVE',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w700,
+                                  color: AppColors.danger,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _streaming ? null : _startStreaming,
+                          icon: const Icon(Icons.play_arrow_rounded),
+                          label: const Text('Start'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.secondary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
                       ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: _streaming ? _stopStreaming : null,
+                          icon: const Icon(Icons.stop_rounded),
+                          label: const Text('Stop'),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: AppColors.danger,
+                            side: BorderSide(color: AppColors.danger.withValues(alpha: 0.5)),
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  AspectRatio(
+                    aspectRatio: 4 / 3,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: AppColors.textDark,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: _latestFrame == null
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.videocam_off_rounded,
+                                    size: 48,
+                                    color: AppColors.textMuted,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'No frame available',
+                                    style: TextStyle(
+                                      color: AppColors.textMuted,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(12),
+                              child: Image.memory(
+                                _latestFrame!,
+                                gaplessPlayback: true,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surface.withOpacity(0.7),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: _buildSensorCards(),
+            ),
+            const SizedBox(height: 16),
+            
+            // Sensor Data Card
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.04),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
-            ],
-          ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Icon(
+                          Icons.sensors_rounded,
+                          color: AppColors.accent,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        'Sensor Readings',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _buildSensorCards(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -365,36 +602,60 @@ class _SensorStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final textTheme = Theme.of(context).textTheme;
-    final surface = Theme.of(context).colorScheme.surface;
-    final secondary = Theme.of(context).colorScheme.secondary;
     final formatted = value.isNaN ? '--' : value.toStringAsFixed(1);
+    final isTemp = unit == '°C';
+    final color = isTemp ? AppColors.chartTemperature : AppColors.chartHumidity;
+    final icon = isTemp ? Icons.thermostat_rounded : Icons.water_drop_rounded;
+    
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [surface.withOpacity(0.9), surface.withOpacity(0.5)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: color.withValues(alpha: 0.2),
+          width: 1,
         ),
-        borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: textTheme.titleMedium?.copyWith(color: secondary.withOpacity(0.8))),
+          Row(
+            children: [
+              Icon(icon, color: color, size: 18),
+              const SizedBox(width: 8),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 12),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
                 formatted,
-                style: textTheme.displaySmall?.copyWith(fontWeight: FontWeight.w900),
+                style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.textDark,
+                ),
               ),
-              const SizedBox(width: 6),
+              const SizedBox(width: 4),
               Padding(
-                padding: const EdgeInsets.only(bottom: 6),
-                child: Text(unit, style: textTheme.titleMedium),
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  unit,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
               ),
             ],
           ),
