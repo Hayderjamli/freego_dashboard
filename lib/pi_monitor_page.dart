@@ -4,6 +4,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'core/services/config.dart';
 import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
 
 /// Internal sensor reading model for WebSocket data
@@ -25,8 +26,8 @@ class PiMonitorPage extends StatefulWidget {
 }
 
 class _PiMonitorPageState extends State<PiMonitorPage> {
-  // Hardcoded WebSocket endpoint (per project requirement)
-  static const String _wsEndpoint = 'ws://192.168.137.104:8000';
+  // Use runtime endpoint from AppConfig so Settings can update it
+  String get _wsEndpoint => AppConfig.wsEndpoint;
   final List<_SensorReading> _history = <_SensorReading>[];
   WebSocketChannel? _channel;
   StreamSubscription<dynamic>? _subscription;

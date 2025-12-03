@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
 import 'package:mobile_app_dashboard/core/constants/models.dart';
+import 'package:mobile_app_dashboard/core/services/config.dart';
 import 'package:mobile_app_dashboard/shared/widgets/dashboard_widgets.dart';
 import 'package:mobile_app_dashboard/auth_service.dart';
 
@@ -49,7 +50,8 @@ class _SettingsPageNewState extends State<SettingsPageNew> {
       text: widget.settings.maxDoorOpenMinutes.toString(),
     );
     _wsEndpointController = TextEditingController(
-      text: 'ws://192.168.137.104:8000',
+      // Default comes from AppConfig so it's shared app-wide
+      text: AppConfig.wsEndpoint,
     );
     _notificationsEnabled = widget.settings.notificationsEnabled;
   }
@@ -72,6 +74,9 @@ class _SettingsPageNewState extends State<SettingsPageNew> {
     widget.settings.maxHumidity = double.tryParse(_maxHumidityController.text) ?? 70.0;
     widget.settings.maxDoorOpenMinutes = int.tryParse(_doorTimeController.text) ?? 5;
     widget.settings.notificationsEnabled = _notificationsEnabled;
+
+    // Update runtime WebSocket endpoint used by the monitor page
+    AppConfig.wsEndpoint = _wsEndpointController.text.trim();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
