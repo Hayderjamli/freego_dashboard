@@ -390,15 +390,41 @@ class _SettingsPageNewState extends State<SettingsPageNew> {
                 ),
               ),
               SizedBox(
-                width: 80,
+                width: 140,
                 child: TextField(
                   controller: _doorTimeController,
                   keyboardType: TextInputType.number,
                   textAlign: TextAlign.center,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     suffixText: 'min',
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                    prefixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          int current = int.tryParse(_doorTimeController.text) ?? 0;
+                          if (current > 1) {
+                            _doorTimeController.text = (current - 1).toString();
+                          }
+                        });
+                      },
+                      icon: const Icon(Icons.remove_circle_outline, size: 18),
+                      color: AppColors.danger,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        setState(() {
+                          int current = int.tryParse(_doorTimeController.text) ?? 0;
+                          _doorTimeController.text = (current + 1).toString();
+                        });
+                      },
+                      icon: const Icon(Icons.add_circle_outline, size: 18),
+                      color: AppColors.secondary,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    ),
                   ),
                 ),
               ),
@@ -453,7 +479,31 @@ class _SettingsPageNewState extends State<SettingsPageNew> {
                 decoration: InputDecoration(
                   labelText: 'Min',
                   suffixText: unit,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  prefixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        double current = double.tryParse(minController.text) ?? 0;
+                        minController.text = (current - 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                      });
+                    },
+                    icon: const Icon(Icons.remove_circle_outline, size: 18),
+                    color: AppColors.danger,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        double current = double.tryParse(minController.text) ?? 0;
+                        minController.text = (current + 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                      });
+                    },
+                    icon: const Icon(Icons.add_circle_outline, size: 18),
+                    color: AppColors.secondary,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
                 ),
               ),
             ),
@@ -476,7 +526,31 @@ class _SettingsPageNewState extends State<SettingsPageNew> {
                 decoration: InputDecoration(
                   labelText: 'Max',
                   suffixText: unit,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  prefixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        double current = double.tryParse(maxController.text) ?? 0;
+                        maxController.text = (current - 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                      });
+                    },
+                    icon: const Icon(Icons.remove_circle_outline, size: 18),
+                    color: AppColors.danger,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      setState(() {
+                        double current = double.tryParse(maxController.text) ?? 0;
+                        maxController.text = (current + 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                      });
+                    },
+                    icon: const Icon(Icons.add_circle_outline, size: 18),
+                    color: AppColors.secondary,
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  ),
                 ),
               ),
             ),

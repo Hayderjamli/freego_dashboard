@@ -41,48 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyA1K4hJQBQwtCG8MoSVotXEbypGT6152Rs',
-    appId: '1:635171467823:web:dd96c42f2f912923990cda',
-    messagingSenderId: '635171467823',
-    projectId: 'frego-47086',
-    authDomain: 'frego-47086.firebaseapp.com',
-    storageBucket: 'frego-47086.firebasestorage.app',
-    measurementId: 'G-PBR2W0618N',
+    apiKey: 'AIzaSyAU48ypLBtNdA991_RTOmFilCEuMTcA7TU',
+    appId: '1:729843070412:web:0b5ec7c2c29b63ebcad969',
+    messagingSenderId: '729843070412',
+    projectId: 'freego-edb69',
+    authDomain: 'freego-edb69.firebaseapp.com',
+    storageBucket: 'freego-edb69.firebasestorage.app',
+    measurementId: 'G-W6S1M6PD3R',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyB938IRECgLTyUABPEDHtApHiYdGn4B0ms',
-    appId: '1:635171467823:android:16f77eb40aadcd50990cda',
-    messagingSenderId: '635171467823',
-    projectId: 'frego-47086',
-    storageBucket: 'frego-47086.firebasestorage.app',
+    apiKey: 'AIzaSyD4mTT0SnQq9DBUiPPzYYoCMs0z_xX3fTY',
+    appId: '1:729843070412:android:a2d57a6869b83624cad969',
+    messagingSenderId: '729843070412',
+    projectId: 'freego-edb69',
+    storageBucket: 'freego-edb69.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyD4K3wNppfg4sG7NmyWbw5Of6PUZGl_w64',
-    appId: '1:635171467823:ios:6f4466501927ece0990cda',
-    messagingSenderId: '635171467823',
-    projectId: 'frego-47086',
-    storageBucket: 'frego-47086.firebasestorage.app',
+    apiKey: 'AIzaSyB2tm0nxvWwrP0VaXXfnpC2gbadpI6BZmU',
+    appId: '1:729843070412:ios:43c3e2f21247410ecad969',
+    messagingSenderId: '729843070412',
+    projectId: 'freego-edb69',
+    storageBucket: 'freego-edb69.firebasestorage.app',
     iosBundleId: 'com.example.mobileAppDashboard',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyD4K3wNppfg4sG7NmyWbw5Of6PUZGl_w64',
-    appId: '1:635171467823:ios:6f4466501927ece0990cda',
-    messagingSenderId: '635171467823',
-    projectId: 'frego-47086',
-    storageBucket: 'frego-47086.firebasestorage.app',
+    apiKey: 'AIzaSyB2tm0nxvWwrP0VaXXfnpC2gbadpI6BZmU',
+    appId: '1:729843070412:ios:43c3e2f21247410ecad969',
+    messagingSenderId: '729843070412',
+    projectId: 'freego-edb69',
+    storageBucket: 'freego-edb69.firebasestorage.app',
     iosBundleId: 'com.example.mobileAppDashboard',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyA1K4hJQBQwtCG8MoSVotXEbypGT6152Rs',
-    appId: '1:635171467823:web:90ea869c5247a37b990cda',
-    messagingSenderId: '635171467823',
-    projectId: 'frego-47086',
-    authDomain: 'frego-47086.firebaseapp.com',
-    storageBucket: 'frego-47086.firebasestorage.app',
-    measurementId: 'G-H2W7SFYVBT',
+    apiKey: 'AIzaSyAU48ypLBtNdA991_RTOmFilCEuMTcA7TU',
+    appId: '1:729843070412:web:21bc59e39d4b0416cad969',
+    messagingSenderId: '729843070412',
+    projectId: 'freego-edb69',
+    authDomain: 'freego-edb69.firebaseapp.com',
+    storageBucket: 'freego-edb69.firebasestorage.app',
+    measurementId: 'G-9G5LGQWJ4B',
   );
+
 }

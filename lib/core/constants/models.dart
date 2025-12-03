@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 /// Data models for the FreeGo Dashboard.
 /// 
 /// Contains sensor readings, door status, and dashboard data classes.
@@ -83,6 +85,44 @@ class AlertNotification {
     if (diff.inMinutes < 60) return '${diff.inMinutes}m ago';
     if (diff.inHours < 24) return '${diff.inHours}h ago';
     return '${diff.inDays}d ago';
+  }
+
+  /// Get color based on alert type.
+  Color get color {
+    switch (type) {
+      case AlertType.temperatureHigh:
+      case AlertType.doorOpenTooLong:
+        return const Color(0xFFEB5757);
+      case AlertType.temperatureLow:
+        return const Color(0xFF56CCF2);
+      case AlertType.humidityHigh:
+        return const Color(0xFF2D9CDB);
+      case AlertType.humidityLow:
+        return const Color(0xFFF2C94C);
+      case AlertType.lowBattery:
+        return const Color(0xFFF2994A);
+      case AlertType.connectionLost:
+        return const Color(0xFF828282);
+    }
+  }
+
+  /// Get icon based on alert type.
+  IconData get icon {
+    switch (type) {
+      case AlertType.temperatureHigh:
+        return Icons.thermostat;
+      case AlertType.temperatureLow:
+        return Icons.ac_unit;
+      case AlertType.humidityHigh:
+      case AlertType.humidityLow:
+        return Icons.water_drop;
+      case AlertType.doorOpenTooLong:
+        return Icons.door_front_door;
+      case AlertType.lowBattery:
+        return Icons.battery_alert;
+      case AlertType.connectionLost:
+        return Icons.wifi_off;
+    }
   }
 }
 
@@ -293,7 +333,7 @@ class DeviceInfo {
 
   static DeviceInfo defaultDevice() {
     return const DeviceInfo(
-      name: 'FreeGo Freezer',
+      name: 'FreeGo ',
       model: 'FG-001',
       firmwareVersion: '1.0.0',
       serialNumber: 'FG2024001',

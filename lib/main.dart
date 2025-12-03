@@ -3,6 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app_dashboard/welcome_page.dart';
 import 'package:mobile_app_dashboard/notification_service.dart';
+import 'package:mobile_app_dashboard/notifications_page.dart';
 import 'package:mobile_app_dashboard/pi_monitor_page.dart';
 import 'package:mobile_app_dashboard/features/dashboard/presentation/widgets/dashboard_home_page.dart';
 import 'package:mobile_app_dashboard/features/charts/charts_page.dart';
@@ -393,7 +394,7 @@ class _OverviewPageState extends State<OverviewPage> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const NotificationsPage()),
+                    MaterialPageRoute(builder: (context) => NotificationsPage()),
                   ).then((_) => setState(() {}));
                 },
                 icon: const Icon(Icons.notifications_outlined),
@@ -1884,73 +1885,4 @@ class _StatusCounter extends StatelessWidget {
   }
 }
 
-class DashboardData {
-  const DashboardData({
-    required this.temperatureReadings,
-    required this.humidityReadings,
-    required this.doorCycles,
-    required this.doorStatus,
-    required this.lastUpdated,
-  });
-
-  final List<SensorReading> temperatureReadings;
-  final List<SensorReading> humidityReadings;
-  final List<DoorCycleStat> doorCycles;
-  final DoorStatus doorStatus;
-  final DateTime lastUpdated;
-
-  String get lastUpdatedLabel =>
-      '${lastUpdated.hour.toString().padLeft(2, '0')}:${lastUpdated.minute.toString().padLeft(2, '0')}';
-
-  static DashboardData sample() {
-    return DashboardData(
-      temperatureReadings: const [
-        SensorReading(label: '00h', value: 19.5),
-        SensorReading(label: '04h', value: 18.8),
-        SensorReading(label: '08h', value: 20.2),
-        SensorReading(label: '12h', value: 23.5),
-        SensorReading(label: '16h', value: 24.2),
-        SensorReading(label: '20h', value: 22.4),
-        SensorReading(label: '24h', value: 20.1),
-      ],
-      humidityReadings: const [
-        SensorReading(label: '00h', value: 62),
-        SensorReading(label: '04h', value: 65),
-        SensorReading(label: '08h', value: 58),
-        SensorReading(label: '12h', value: 54),
-        SensorReading(label: '16h', value: 50),
-        SensorReading(label: '20h', value: 55),
-        SensorReading(label: '24h', value: 60),
-      ],
-      doorCycles: const [
-        DoorCycleStat(label: 'Matin', openings: 5, closures: 5),
-        DoorCycleStat(label: 'Midi', openings: 7, closures: 6),
-        DoorCycleStat(label: 'Après-midi', openings: 4, closures: 5),
-        DoorCycleStat(label: 'Soir', openings: 6, closures: 6),
-      ],
-      doorStatus: DoorStatus.open,
-      lastUpdated: DateTime.now(),
-    );
-  }
-}
-
-class SensorReading {
-  const SensorReading({required this.label, required this.value});
-
-  final String label;
-  final double value;
-}
-
-class DoorCycleStat {
-  const DoorCycleStat({
-    required this.label,
-    required this.openings,
-    required this.closures,
-  });
-
-  final String label;
-  final int openings;
-  final int closures;
-}
-
-enum DoorStatus { open, closed }
+// DashboardData, SensorReading, DoorCycleStat, and DoorStatus moved to core/constants/models.dart

@@ -45,26 +45,22 @@ class _LoginPageState extends State<LoginPage> {
                 children: <Widget>[
                   // Logo
                   Container(
-                    width: 72,
-                    height: 72,
+                    width: 120,
+                    height: 120,
                     margin: const EdgeInsets.only(bottom: 32),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(18),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.ac_unit_rounded,
-                        color: Colors.white,
-                        size: 36,
-                      ),
+                    child: Image.asset(
+                      'assets/images/freego_logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback if image is not found
+                        return const Center(
+                          child: Icon(
+                            Icons.eco_rounded,
+                            color: Color(0xFF27AE60),
+                            size: 60,
+                          ),
+                        );
+                      },
                     ),
                   ),
                   
@@ -133,7 +129,7 @@ class _LoginPageState extends State<LoginPage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
+                              backgroundColor: AppColors.secondary,
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(

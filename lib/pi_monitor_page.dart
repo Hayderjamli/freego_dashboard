@@ -8,7 +8,7 @@ import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
 
 /// Internal sensor reading model for WebSocket data
 class _SensorReading {
-  __SensorReading({required this.timestamp, required this.temperature, required this.humidity});
+  _SensorReading({required this.timestamp, required this.temperature, required this.humidity});
 
   final String timestamp;
   final double temperature;
@@ -95,7 +95,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
       );
       setState(() {
         _channel = channel;
-        _statusMessage = 'Connected to ${uri.host}:${uri.port}';
+        _statusMessage = null; // Hide the status message, only show Connected/Disconnected
       });
     } catch (error) {
       setState(() {
@@ -121,7 +121,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
     setState(() {
       _channel = null;
       _streaming = false;
-      _statusMessage = 'Disconnected.';
+      _statusMessage = null; // Hide the status message
     });
   }
 
@@ -326,7 +326,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      Expanded(
+                      /*Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -347,7 +347,7 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
                             ),
                           ],
                         ),
-                      ),
+                      ),*/
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(

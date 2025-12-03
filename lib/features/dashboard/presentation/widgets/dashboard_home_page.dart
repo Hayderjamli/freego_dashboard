@@ -70,19 +70,23 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
+                        color: AppColors.secondary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(
-                        Icons.ac_unit_rounded,
-                        color: AppColors.primary,
-                        size: 28,
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.asset(
+                          'assets/images/freego_logo.png',
+                          width: 100,
+                          height: 100,
+                          fit: BoxFit.contain,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Column(
+                    /*Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
+                      /*children: [
                         Text(
                           'FreeGo',
                           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -96,8 +100,8 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                             color: AppColors.textSecondary,
                           ),
                         ),
-                      ],
-                    ),
+                      ],*/
+                    ),*/
                   ],
                 ),
               ],
@@ -292,7 +296,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
 
   Widget _buildDeviceStatusCard(BuildContext context, DashboardData data) {
     return DashboardCard(
-      gradient: AppColors.primaryGradient,
+      gradient: AppColors.successGradient,
       child: Row(
         children: [
           Container(
@@ -313,7 +317,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'FreeGo Solar Freezer',
+                  'FreeGo ',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -331,17 +335,22 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                       ),
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      data.isConnected ? 'Connected' : 'Disconnected',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.9),
+                    Flexible(
+                      child: Text(
+                        data.isConnected ? 'Connected' : 'Disconnected',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.9),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Text(
-                      'Last sync: ${data.lastUpdatedLabel}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.white.withValues(alpha: 0.7),
+                    Flexible(
+                      child: Text(
+                        'Last sync: ${data.lastUpdatedLabel}',
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: Colors.white.withValues(alpha: 0.7),
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
@@ -603,7 +612,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
           ),
           const SizedBox(height: 12),
           Text(
-            '${input.toStringAsFixed(1)}W',
+            '0.2W',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
@@ -619,7 +628,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
               ),
               const SizedBox(width: 4),
               Text(
-                input > 0 ? 'Charging' : 'No input',
+                'Charging',
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                   color: AppColors.textMuted,
                 ),

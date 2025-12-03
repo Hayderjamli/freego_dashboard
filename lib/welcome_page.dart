@@ -51,8 +51,8 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppColors.primary.withValues(alpha: 0.15),
-                            AppColors.primary.withValues(alpha: 0.0),
+                            const Color(0xFF27AE60).withValues(alpha: 0.15),
+                            const Color(0xFF27AE60).withValues(alpha: 0.0),
                           ],
                         ),
                       ),
@@ -68,8 +68,8 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                         shape: BoxShape.circle,
                         gradient: RadialGradient(
                           colors: [
-                            AppColors.secondary.withValues(alpha: 0.12),
-                            AppColors.secondary.withValues(alpha: 0.0),
+                            const Color(0xFF6FCF97).withValues(alpha: 0.12),
+                            const Color(0xFF6FCF97).withValues(alpha: 0.0),
                           ],
                         ),
                       ),
@@ -89,29 +89,25 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                 children: <Widget>[
                   // Logo
                   Container(
-                    width: 80,
-                    height: 80,
+                    width: 120,
+                    height: 120,
                     margin: const EdgeInsets.only(bottom: 24),
-                    decoration: BoxDecoration(
-                      gradient: AppColors.primaryGradient,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withValues(alpha: 0.3),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.ac_unit_rounded,
-                        color: Colors.white,
-                        size: 40,
-                      ),
+                    child: Image.asset(
+                      'assets/images/freego_logo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Fallback if image is not found
+                        return const Center(
+                          child: Icon(
+                            Icons.eco_rounded,
+                            color: Color(0xFF27AE60),
+                            size: 60,
+                          ),
+                        );
+                      },
                     ),
                   ),
-                  
+                  /*
                   Text(
                     'FreeGo',
                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
@@ -120,18 +116,18 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 8),*/
                   Text(
-                    'Smart Solar Freezer Dashboard',
+                    'Smart Solar Storage Dashboard',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: AppColors.primary,
+                      color: const Color(0xFF27AE60),
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Monitor temperature, humidity, and freezer activity with real-time analytics and instant alerts.',
+                    'Store smart, Waste less, Earn more with FreeGo',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: AppColors.textSecondary,
                       height: 1.6,
@@ -149,7 +145,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                       );
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
+                      backgroundColor: const Color(0xFF27AE60),
                       foregroundColor: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
@@ -177,8 +173,8 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                       );
                     },
                     style: OutlinedButton.styleFrom(
-                      foregroundColor: AppColors.primary,
-                      side: const BorderSide(color: AppColors.primary, width: 1.5),
+                      foregroundColor: const Color(0xFF27AE60),
+                      side: const BorderSide(color: Color(0xFF27AE60), width: 1.5),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
