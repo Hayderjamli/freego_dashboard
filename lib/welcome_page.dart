@@ -92,7 +92,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                     const AnimatedFreeGoLogo(size: 60),
                     const SizedBox(height: 32),
                     ShaderMask(
-                      shaderCallback: (bounds) => AppPalette.energyGradient.createShader(bounds),
+                      shaderCallback: (bounds) => AppPalette.leafGradient.createShader(bounds),
                       child: Text(
                         'WELCOME TO FREEGO',
                         style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -105,7 +105,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                     ),
                     const SizedBox(height: 20),
                     Text(
-                      'Track Your Performance',
+                      'Smart Agriculture Monitoring',
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             color: AppPalette.electricBlue,
                             fontWeight: FontWeight.w800,
@@ -115,7 +115,7 @@ class _WelcomePageState extends State<WelcomePage> with SingleTickerProviderStat
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'Monitor temperature, humidity, and door activity with real-time analytics and dynamic insights.',
+                      'Monitor temperature, humidity, and greenhouse conditions with real-time analytics for optimal crop growth.',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             color: AppPalette.textSecondary,
                             height: 1.6,

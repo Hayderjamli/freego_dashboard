@@ -12,19 +12,25 @@ import 'firebase_options.dart';
 class AppPalette {
   const AppPalette._();
 
-  // Sporty vibrant colors
-  static const Color darkBg = Color(0xFF0A0E27);
-  static const Color deepPurple = Color(0xFF1A1B3D);
-  static const Color richPurple = Color(0xFF2E3192);
-  static const Color electricBlue = Color(0xFF00D4FF);
-  static const Color neonPink = Color(0xFFFF006E);
-  static const Color vibrantOrange = Color(0xFFFF6B35);
-  static const Color energyYellow = Color(0xFFFFBE0B);
-  static const Color sportGreen = Color(0xFF06FFA5);
-  static const Color cardDark = Color(0xFF1C1E3B);
+  // Agriculture-themed colors inspired by FreeGo logo
+  // Navy blue from logo text + cyan leaves + natural earth tones
+  static const Color darkBg = Color(0xFF1A2E35);           // Deep forest green-teal
+  static const Color deepPurple = Color(0xFF243B44);        // Muted teal-gray (renamed for compatibility)
+  static const Color richPurple = Color(0xFF2E5A4B);        // Forest green (renamed for compatibility)
+  static const Color electricBlue = Color(0xFF4ECDC4);      // Cyan leaf color from logo
+  static const Color neonPink = Color(0xFFE07A5F);          // Terracotta/earthy warm (alert color)
+  static const Color vibrantOrange = Color(0xFFD4A574);     // Warm wheat/hay color
+  static const Color energyYellow = Color(0xFFF4D35E);      // Sunshine yellow for crops
+  static const Color sportGreen = Color(0xFF6BBF59);        // Fresh plant green
+  static const Color cardDark = Color(0xFF2A3F47);          // Card background
   static const Color textPrimary = Color(0xFFFFFFFF);
-  static const Color textSecondary = Color(0xFFB8B9D4);
-  static const Color textMuted = Color(0xFF7B7D9D);
+  static const Color textSecondary = Color(0xFFB8C9C4);     // Soft sage
+  static const Color textMuted = Color(0xFF7A9A8E);         // Muted green-gray
+
+  // Logo-specific colors
+  static const Color logoNavy = Color(0xFF2E4057);          // Navy blue from FreeGo text
+  static const Color logoCyan = Color(0xFF4ECDC4);          // Cyan from leaf
+  static const Color logoLeafLight = Color(0xFF7EDCE2);     // Light cyan leaf
 
   static final LinearGradient backgroundGradient = const LinearGradient(
     colors: [darkBg, deepPurple],
@@ -32,19 +38,34 @@ class AppPalette {
     end: Alignment.bottomRight,
   );
 
-static final LinearGradient energyGradient = const LinearGradient(
-  colors: [Color(0xFF667eea), Color(0xFF764ba2)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
+  // Nature/agriculture gradients
+  static final LinearGradient energyGradient = const LinearGradient(
+    colors: [Color(0xFF6BBF59), Color(0xFF4ECDC4)],  // Green to cyan
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
 
-static final LinearGradient sportGradient = const LinearGradient(
-  colors: [Color.fromARGB(255, 11, 24, 102), Color(0xFF26d0ce)],
-  begin: Alignment.topLeft,
-  end: Alignment.bottomRight,
-);
+  static final LinearGradient sportGradient = const LinearGradient(
+    colors: [Color(0xFF2E4057), Color(0xFF4ECDC4)],  // Navy to cyan (logo colors)
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
   static final LinearGradient purpleGradient = const LinearGradient(
-    colors: [richPurple, Color(0xFF5E3FBE)],
+    colors: [Color(0xFF2E5A4B), Color(0xFF3D7A6B)],  // Forest greens
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // New agriculture-specific gradients
+  static final LinearGradient leafGradient = const LinearGradient(
+    colors: [Color(0xFF4ECDC4), Color(0xFF7EDCE2)],  // Cyan leaves
+    begin: Alignment.bottomCenter,
+    end: Alignment.topCenter,
+  );
+
+  static final LinearGradient earthGradient = const LinearGradient(
+    colors: [Color(0xFF8B7355), Color(0xFFD4A574)],  // Earth tones
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
   );
@@ -803,9 +824,9 @@ class _OverviewHeader extends StatelessWidget {
             const AnimatedFreeGoLogo(size: 42),
             const SizedBox(height: 24),
             ShaderMask(
-              shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+              shaderCallback: (bounds) => AppPalette.leafGradient.createShader(bounds),
               child: Text(
-                'PERFORMANCE TRACKER',
+                'SMART AGRICULTURE',
                 style: textTheme.labelLarge?.copyWith(
                   color: Colors.white,
                   fontWeight: FontWeight.w900,
@@ -815,7 +836,7 @@ class _OverviewHeader extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Home Monitoring System',
+              'Farm Monitoring System',
               style: textTheme.headlineMedium?.copyWith(
                 fontWeight: FontWeight.w900,
                 letterSpacing: -0.5,
@@ -889,7 +910,7 @@ class _SectionHeading extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ShaderMask(
-          shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+          shaderCallback: (bounds) => AppPalette.leafGradient.createShader(bounds),
           child: Text(
             title,
             style: textTheme.titleLarge?.copyWith(
@@ -962,14 +983,21 @@ class FreeGoLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final gradient = LinearGradient(
+    // Use logo colors - navy blue text with cyan leaves
+    final textGradient = LinearGradient(
       colors: [
-        Color.lerp(AppPalette.electricBlue, AppPalette.sportGreen, animationValue)!,
-        Color.lerp(AppPalette.sportGreen, AppPalette.energyYellow, animationValue)!,
+        Color.lerp(AppPalette.logoNavy, const Color(0xFF3D5A80), animationValue)!,
+        Color.lerp(const Color(0xFF3D5A80), AppPalette.logoNavy, animationValue)!,
       ],
-      begin: Alignment.topLeft,
-      end: Alignment.bottomRight,
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
     );
+
+    final leafColor = Color.lerp(
+      AppPalette.logoCyan,
+      AppPalette.logoLeafLight,
+      animationValue,
+    )!;
 
     final textStyle = TextStyle(
       fontSize: size,
@@ -983,7 +1011,7 @@ class FreeGoLogo extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         ShaderMask(
-          shaderCallback: (bounds) => gradient.createShader(bounds),
+          shaderCallback: (bounds) => textGradient.createShader(bounds),
           blendMode: BlendMode.srcIn,
           child: Text('Free', style: textStyle),
         ),
@@ -991,39 +1019,116 @@ class FreeGoLogo extends StatelessWidget {
           clipBehavior: Clip.none,
           children: [
             ShaderMask(
-              shaderCallback: (bounds) => gradient.createShader(bounds),
+              shaderCallback: (bounds) => textGradient.createShader(bounds),
               blendMode: BlendMode.srcIn,
               child: Text('Go', style: textStyle),
             ),
+            // Plant leaves sprouting from the 'o' - matching the logo
             Positioned(
-              right: -size * 0.15,
-              top: -size * 0.45,
+              right: -size * 0.05,
+              top: -size * 0.6,
               child: Transform.rotate(
-                angle: -0.2 + (animationValue * 0.4),
-                child: Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                    gradient: AppPalette.energyGradient,
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppPalette.energyYellow.withOpacity(0.6),
-                        blurRadius: 12,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Icon(
-                    Icons.bolt,
-                    size: size * 0.5,
-                    color: Colors.white,
-                  ),
-                ),
+                angle: -0.1 + (animationValue * 0.15),
+                child: _buildLeaves(size, leafColor, animationValue),
               ),
             ),
           ],
         ),
       ],
+    );
+  }
+
+  Widget _buildLeaves(double size, Color leafColor, double animValue) {
+    return SizedBox(
+      width: size * 0.8,
+      height: size * 0.8,
+      child: Stack(
+        children: [
+          // Main leaf (right)
+          Positioned(
+            right: 0,
+            top: size * 0.15,
+            child: Transform.rotate(
+              angle: 0.3 + (animValue * 0.1),
+              child: Container(
+                width: size * 0.35,
+                height: size * 0.5,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      leafColor,
+                      leafColor.withOpacity(0.8),
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(size * 0.4),
+                    topRight: Radius.circular(size * 0.15),
+                    bottomLeft: Radius.circular(size * 0.05),
+                    bottomRight: Radius.circular(size * 0.4),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: leafColor.withOpacity(0.4),
+                      blurRadius: 8,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Secondary leaf (left)
+          Positioned(
+            left: size * 0.1,
+            top: size * 0.05,
+            child: Transform.rotate(
+              angle: -0.5 - (animValue * 0.1),
+              child: Container(
+                width: size * 0.28,
+                height: size * 0.42,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppPalette.logoLeafLight,
+                      leafColor,
+                    ],
+                    begin: Alignment.bottomCenter,
+                    end: Alignment.topCenter,
+                  ),
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(size * 0.12),
+                    topRight: Radius.circular(size * 0.35),
+                    bottomLeft: Radius.circular(size * 0.35),
+                    bottomRight: Radius.circular(size * 0.05),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppPalette.logoLeafLight.withOpacity(0.3),
+                      blurRadius: 6,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          // Small stem
+          Positioned(
+            right: size * 0.25,
+            bottom: 0,
+            child: Container(
+              width: size * 0.06,
+              height: size * 0.25,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6BBF59),
+                borderRadius: BorderRadius.circular(size * 0.03),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1200,7 +1305,7 @@ class _OverviewTileState extends State<_OverviewTile>
                     )
                         : ShaderMask(
                       shaderCallback: (bounds) =>
-                          AppPalette.sportGradient.createShader(bounds),
+                          AppPalette.leafGradient.createShader(bounds),
                       child: Text(widget.value, style: valueStyle),
                     ),
                     if (widget.subtitle != null) ...[
@@ -1328,7 +1433,7 @@ class _DashboardCardState extends State<DashboardCard> {
                 ),
               if (widget.icon != null) const SizedBox(height: 20),
               ShaderMask(
-                shaderCallback: (bounds) => AppPalette.sportGradient.createShader(bounds),
+                shaderCallback: (bounds) => AppPalette.leafGradient.createShader(bounds),
                 child: Text(
                   widget.title.toUpperCase(),
                   style: textTheme.titleLarge?.copyWith(
