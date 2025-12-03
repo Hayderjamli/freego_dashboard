@@ -10,26 +10,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mobile_app_dashboard/main.dart';
 
 void main() {
-  testWidgets('Overview navigates to detailed dashboard', (
+  testWidgets('Welcome page displays correctly', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const DashboardApp());
-
-    expect(find.text("Vue d'ensemble"), findsOneWidget);
-    expect(find.text('Température actuelle'), findsOneWidget);
-    expect(find.text('Voir le tableau de bord détaillé'), findsOneWidget);
-
-    await tester.scrollUntilVisible(
-      find.text('Voir le tableau de bord détaillé'),
-      200,
-    );
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Voir le tableau de bord détaillé'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(FreeGoLogo), findsWidgets);
-    expect(find.text('Température'), findsOneWidget);
-    expect(find.text('Humidité'), findsOneWidget);
+    // Verify welcome page elements
+    expect(find.text('FreeGo'), findsOneWidget);
+    expect(find.text('Smart Solar Freezer Dashboard'), findsOneWidget);
+    expect(find.text('Sign In'), findsOneWidget);
+    expect(find.text('Create Account'), findsOneWidget);
   });
 }
