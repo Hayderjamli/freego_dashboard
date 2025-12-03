@@ -8,7 +8,6 @@ class AgriColors {
   // Primary greens - natural, earthy
   static const Color primaryGreen = Color(0xFF2E7D32); // Forest green
   static const Color sageGreen = Color(0xFF66BB6A);
-  static const Color leafGreen = Color(0xFF4CAF50);
   
   // Earth tones
   static const Color soilBrown = Color(0xFF5D4037);
@@ -17,11 +16,8 @@ class AgriColors {
   
   // Harvest & growth colors
   static const Color goldenHarvest = Color(0xFFF9A825);
-  static const Color wheatGold = Color(0xFFFFB300);
-  static const Color sunflower = Color(0xFFFFCA28);
   
   // Water & sky
-  static const Color skyBlue = Color(0xFF42A5F5);
   static const Color waterBlue = Color(0xFF1E88E5);
   static const Color freshWater = Color(0xFF29B6F6);
   
