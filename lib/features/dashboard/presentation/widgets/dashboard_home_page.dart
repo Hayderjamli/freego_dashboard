@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_dashboard/notifications_page.dart';
-import 'package:mobile_app_dashboard/notification_service.dart';
-import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
-import 'package:mobile_app_dashboard/core/constants/models.dart';
-import 'package:mobile_app_dashboard/shared/widgets/dashboard_widgets.dart';
+import 'package:freego_dashboard/notifications_page.dart';
+import 'package:freego_dashboard/notification_service.dart';
+import 'package:freego_dashboard/core/theme/app_colors.dart';
+import 'package:freego_dashboard/core/constants/models.dart';
+import 'package:freego_dashboard/shared/widgets/dashboard_widgets.dart';
 
 /// Dashboard Home Page - Main dashboard with big metric cards
 /// 

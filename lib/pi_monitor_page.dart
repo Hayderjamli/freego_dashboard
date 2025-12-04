@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import 'core/services/config.dart';
-import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
+import 'package:freego_dashboard/core/theme/app_colors.dart';
 
 /// Internal sensor reading model for WebSocket data
 class _SensorReading {

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
+import 'package:freego_dashboard/core/theme/app_colors.dart';
 
 /// A modern, rounded card widget with soft shadows.
 /// 

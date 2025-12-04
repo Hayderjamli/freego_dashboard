@@ -7,7 +7,7 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:mobile_app_dashboard/main.dart';
+import 'package:freego_dashboard/main.dart';
 
 void main() {
   testWidgets('Welcome page displays correctly', (

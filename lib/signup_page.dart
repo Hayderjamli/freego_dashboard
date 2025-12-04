@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_dashboard/auth_service.dart';
-import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
-import 'package:mobile_app_dashboard/main.dart';
+import 'package:freego_dashboard/auth_service.dart';
+import 'package:freego_dashboard/core/theme/app_colors.dart';
+import 'package:freego_dashboard/main.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});

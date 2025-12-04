@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_dashboard/login_page.dart';
-import 'package:mobile_app_dashboard/signup_page.dart';
-import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
+import 'package:freego_dashboard/login_page.dart';
+import 'package:freego_dashboard/signup_page.dart';
+import 'package:freego_dashboard/core/theme/app_colors.dart';
 import 'main.dart'; // For HomePage navigation
 
 class WelcomePage extends StatefulWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app_dashboard/core/theme/app_colors.dart';
-import 'package:mobile_app_dashboard/core/constants/models.dart';
+import 'package:freego_dashboard/core/theme/app_colors.dart';
+import 'package:freego_dashboard/core/constants/models.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
