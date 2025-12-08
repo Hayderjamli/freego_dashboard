@@ -473,90 +473,155 @@ class _SettingsPageNewState extends State<SettingsPageNew> {
         const SizedBox(height: 12),
         Row(
           children: [
+            // Min value input
             Expanded(
-              child: TextField(
-                controller: minController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textAlign: TextAlign.center,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*')),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Min',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              double current = double.tryParse(minController.text) ?? 0;
+                              minController.text = (current - 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                            });
+                          },
+                          icon: const Icon(Icons.remove_circle_outline),
+                          color: AppColors.danger,
+                          iconSize: 18,
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: minController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*')),
+                            ],
+                            decoration: InputDecoration(
+                              suffixText: unit,
+                              suffixStyle: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              double current = double.tryParse(minController.text) ?? 0;
+                              minController.text = (current + 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                            });
+                          },
+                          icon: const Icon(Icons.add_circle_outline),
+                          color: AppColors.secondary,
+                          iconSize: 18,
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-                decoration: InputDecoration(
-                  labelText: 'Min',
-                  suffixText: unit,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  prefixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        double current = double.tryParse(minController.text) ?? 0;
-                        minController.text = (current - 1).toStringAsFixed(unit == '°C' ? 1 : 0);
-                      });
-                    },
-                    icon: const Icon(Icons.remove_circle_outline, size: 18),
-                    color: AppColors.danger,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        double current = double.tryParse(minController.text) ?? 0;
-                        minController.text = (current + 1).toStringAsFixed(unit == '°C' ? 1 : 0);
-                      });
-                    },
-                    icon: const Icon(Icons.add_circle_outline, size: 18),
-                    color: AppColors.secondary,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 20, left: 8, right: 8),
+              child: Text(
+                'to',
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSecondary,
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            Text(
-              'to',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-            const SizedBox(width: 12),
+            // Max value input
             Expanded(
-              child: TextField(
-                controller: maxController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                textAlign: TextAlign.center,
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*')),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Max',
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: AppColors.textSecondary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Container(
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant.withValues(alpha: 0.3),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              double current = double.tryParse(maxController.text) ?? 0;
+                              maxController.text = (current - 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                            });
+                          },
+                          icon: const Icon(Icons.remove_circle_outline),
+                          color: AppColors.danger,
+                          iconSize: 18,
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                        ),
+                        Expanded(
+                          child: TextField(
+                            controller: maxController,
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(RegExp(r'^-?\d*\.?\d*')),
+                            ],
+                            decoration: InputDecoration(
+                              suffixText: unit,
+                              suffixStyle: TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 2, vertical: 8),
+                              isDense: true,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            setState(() {
+                              double current = double.tryParse(maxController.text) ?? 0;
+                              maxController.text = (current + 1).toStringAsFixed(unit == '°C' ? 1 : 0);
+                            });
+                          },
+                          icon: const Icon(Icons.add_circle_outline),
+                          color: AppColors.secondary,
+                          iconSize: 18,
+                          padding: const EdgeInsets.all(4),
+                          constraints: const BoxConstraints(minWidth: 30, minHeight: 30),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-                decoration: InputDecoration(
-                  labelText: 'Max',
-                  suffixText: unit,
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-                  prefixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        double current = double.tryParse(maxController.text) ?? 0;
-                        maxController.text = (current - 1).toStringAsFixed(unit == '°C' ? 1 : 0);
-                      });
-                    },
-                    icon: const Icon(Icons.remove_circle_outline, size: 18),
-                    color: AppColors.danger,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  ),
-                  suffixIcon: IconButton(
-                    onPressed: () {
-                      setState(() {
-                        double current = double.tryParse(maxController.text) ?? 0;
-                        maxController.text = (current + 1).toStringAsFixed(unit == '°C' ? 1 : 0);
-                      });
-                    },
-                    icon: const Icon(Icons.add_circle_outline, size: 18),
-                    color: AppColors.secondary,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                  ),
-                ),
               ),
             ),
           ],

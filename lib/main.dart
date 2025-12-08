@@ -9,6 +9,10 @@ import 'package:freego_dashboard/features/dashboard/presentation/widgets/dashboa
 import 'package:freego_dashboard/features/charts/charts_page.dart';
 import 'package:freego_dashboard/features/alerts/alerts_page.dart';
 import 'package:freego_dashboard/features/settings/settings_page_new.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'core/services/config.dart';
 import 'core/theme/app_colors.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/models.dart';
@@ -110,6 +114,11 @@ class _HomePageState extends State<HomePage> {
   // Sensor data lists to track incoming data
   final List<SensorReading> temperatureReadings = [];
   final List<SensorReading> humidityReadings = [];
+  
+  // WebSocket connection for persistent data streaming
+  WebSocketChannel? _channel;
+  StreamSubscription<dynamic>? _subscription;
+  bool _isConnected = false;
 
   @override
   void initState() {
@@ -126,21 +135,79 @@ class _HomePageState extends State<HomePage> {
       doorStatus: DoorStatus.closed,
       lastUpdated: DateTime.now(),
     );
+    // Start WebSocket connection automatically
+    _connectToRaspberryPi();
     // Check thresholds periodically
     Future.delayed(const Duration(seconds: 5), () {
       _checkThresholds();
     });
+  }
+  
+  void _connectToRaspberryPi() async {
+    try {
+      final uri = Uri.parse(AppConfig.wsEndpoint);
+      final channel = WebSocketChannel.connect(uri);
+      _subscription = channel.stream.listen(
+        _handleWebSocketMessage,
+        onDone: () {
+          if (mounted) {
+            setState(() => _isConnected = false);
+            // Auto-reconnect after 3 seconds
+            Future.delayed(const Duration(seconds: 3), _connectToRaspberryPi);
+          }
+        },
+        onError: (error) {
+          if (mounted) {
+            setState(() => _isConnected = false);
+            // Auto-reconnect after 3 seconds
+            Future.delayed(const Duration(seconds: 3), _connectToRaspberryPi);
+          }
+        },
+      );
+      setState(() {
+        _channel = channel;
+        _isConnected = true;
+      });
+      // Automatically start streaming
+      _channel!.sink.add('START_STREAM:15');
+    } catch (error) {
+      if (mounted) {
+        setState(() => _isConnected = false);
+        // Auto-reconnect after 3 seconds
+        Future.delayed(const Duration(seconds: 3), _connectToRaspberryPi);
+      }
+    }
+  }
+  
+  void _handleWebSocketMessage(dynamic data) {
+    try {
+      if (data is! String) return;
+      final payload = jsonDecode(data) as Map<String, dynamic>;
+      if (payload['type'] == 'sensor') {
+        final temperature = (payload['temperature'] as num?)?.toDouble();
+        final humidity = (payload['humidity'] as num?)?.toDouble();
+        _addSensorReading(temperature, humidity);
+      }
+    } catch (error) {
+      // Ignore parsing errors
+    }
   }
 
   void _addSensorReading(double? temperature, double? humidity) {
     if (!mounted) return;
 
     setState(() {
+      final now = DateTime.now();
+      
       // Add temperature reading (keep last 7 readings for chart)
       if (temperature != null) {
         final tempLabel = 'T${temperatureReadings.length}';
         temperatureReadings.add(
-          SensorReading(label: tempLabel, value: temperature),
+          SensorReading(
+            label: tempLabel, 
+            value: temperature,
+            timestamp: now,
+          ),
         );
         if (temperatureReadings.length > 7) {
           temperatureReadings.removeAt(0);
@@ -150,7 +217,13 @@ class _HomePageState extends State<HomePage> {
       // Add humidity reading (keep last 7 readings for chart)
       if (humidity != null) {
         final humLabel = 'H${humidityReadings.length}';
-        humidityReadings.add(SensorReading(label: humLabel, value: humidity));
+        humidityReadings.add(
+          SensorReading(
+            label: humLabel, 
+            value: humidity,
+            timestamp: now,
+          ),
+        );
         if (humidityReadings.length > 7) {
           humidityReadings.removeAt(0);
         }
@@ -202,6 +275,8 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _subscription?.cancel();
+    _channel?.sink.close();
     _pageController.dispose();
     super.dispose();
   }

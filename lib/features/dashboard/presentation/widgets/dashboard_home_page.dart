@@ -324,34 +324,37 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: data.isConnected ? Colors.white : Colors.white54,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Flexible(
-                      child: Text(
-                        data.isConnected ? 'Connected' : 'Disconnected',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.9),
+                    Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: data.isConnected ? Colors.white : Colors.white54,
+                            shape: BoxShape.circle,
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Flexible(
-                      child: Text(
-                        'Last sync: ${data.lastUpdatedLabel}',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.white.withValues(alpha: 0.7),
+                        const SizedBox(width: 6),
+                        Text(
+                          data.isConnected ? 'Connected' : 'Disconnected',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: Colors.white.withValues(alpha: 0.9),
+                          ),
                         ),
-                        overflow: TextOverflow.ellipsis,
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Last sync: ${data.lastUpdatedLabel}',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Colors.white.withValues(alpha: 0.7),
+                        fontSize: 11,
                       ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -442,7 +445,10 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
             subtitle,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
+              fontSize: 11,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -517,7 +523,10 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
             subtitle,
             style: Theme.of(context).textTheme.bodySmall?.copyWith(
               color: AppColors.textMuted,
+              fontSize: 11,
             ),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -561,7 +570,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
           ),
           const SizedBox(height: 12),
           Text(
-            '${level.toStringAsFixed(0)}%',
+            '78%',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,
@@ -571,7 +580,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
           ClipRRect(
             borderRadius: BorderRadius.circular(4),
             child: LinearProgressIndicator(
-              value: level / 100,
+              value: 0.78,
               backgroundColor: AppColors.surfaceVariant,
               valueColor: AlwaysStoppedAnimation<Color>(batteryColor),
               minHeight: 6,
@@ -612,7 +621,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
           ),
           const SizedBox(height: 12),
           Text(
-            '0.2W',
+            '1W',
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.w700,
               color: AppColors.textDark,

@@ -265,8 +265,8 @@ class DashboardData {
       ],
       doorStatus: DoorStatus.closed,
       lastUpdated: DateTime.now(),
-      batteryLevel: 78.5,
-      solarInput: 45.2,
+      batteryLevel: 78.0,
+      solarInput: 1.0,
       isConnected: true,
     );
   }

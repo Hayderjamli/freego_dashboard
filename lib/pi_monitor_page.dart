@@ -98,6 +98,8 @@ class _PiMonitorPageState extends State<PiMonitorPage> {
         _channel = channel;
         _statusMessage = null; // Hide the status message, only show Connected/Disconnected
       });
+      // Automatically start streaming after connection
+      _startStreaming();
     } catch (error) {
       setState(() {
         _statusMessage = 'Failed to connect: $error. Reconnecting...';

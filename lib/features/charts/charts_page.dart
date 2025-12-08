@@ -304,14 +304,16 @@ class _ChartsPageState extends State<ChartsPage> {
 
     final minY = readings.map((r) => r.value).reduce((a, b) => a < b ? a : b);
     final maxY = readings.map((r) => r.value).reduce((a, b) => a > b ? a : b);
-    final padding = (maxY - minY) * 0.1;
+    final range = maxY - minY;
+    final padding = range > 0 ? range * 0.1 : 1.0;
+    final interval = range > 0 ? range / 4 : 1.0;
 
     return LineChart(
       LineChartData(
         gridData: FlGridData(
           show: true,
           drawVerticalLine: false,
-          horizontalInterval: (maxY - minY) / 4,
+          horizontalInterval: interval,
           getDrawingHorizontalLine: (value) => FlLine(
             color: AppColors.surfaceVariant,
             strokeWidth: 1,
@@ -322,7 +324,7 @@ class _ChartsPageState extends State<ChartsPage> {
             sideTitles: SideTitles(
               showTitles: true,
               reservedSize: 40,
-              interval: (maxY - minY) / 4,
+              interval: interval,
               getTitlesWidget: (value, meta) {
                 return Text(
                   '${value.toStringAsFixed(0)}$unit',
@@ -346,10 +348,18 @@ class _ChartsPageState extends State<ChartsPage> {
                 if (readings.length > 5 && index % 2 != 0) {
                   return const SizedBox.shrink();
                 }
+                // Format timestamp as HH:mm if available, otherwise use label
+                String displayText;
+                if (readings[index].timestamp != null) {
+                  final time = readings[index].timestamp!;
+                  displayText = '${time.hour.toString().padLeft(2, '0')}:${time.minute.toString().padLeft(2, '0')}';
+                } else {
+                  displayText = readings[index].label;
+                }
                 return Padding(
                   padding: const EdgeInsets.only(top: 8),
                   child: Text(
-                    readings[index].label,
+                    displayText,
                     style: TextStyle(
                       fontSize: 10,
                       color: AppColors.textMuted,
