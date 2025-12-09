@@ -372,9 +372,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
 
   Widget _buildTemperatureCard(double? value, DashboardData data) {
     final displayValue = value?.toStringAsFixed(1) ?? '--';
-    final subtitle = data.minTemperature != null && data.maxTemperature != null
-        ? 'Range: ${data.minTemperature!.toStringAsFixed(1)}°C to ${data.maxTemperature!.toStringAsFixed(1)}°C'
-        : 'Waiting for data...';
+    final hasRange = data.minTemperature != null && data.maxTemperature != null;
     
     Color tempColor = AppColors.secondary;
     if (value != null) {
@@ -440,16 +438,81 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 11,
+          if (hasRange) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.textMuted.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Min',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textMuted,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${data.minTemperature!.toStringAsFixed(1)}°C',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: tempColor.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Max',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: tempColor,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${data.maxTemperature!.toStringAsFixed(1)}°C',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: tempColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+          ] else ...[
+            const SizedBox(height: 8),
+            Text(
+              'Waiting for data...',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textMuted,
+                fontSize: 11,
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -457,9 +520,7 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
 
   Widget _buildHumidityCard(double? value, DashboardData data) {
     final displayValue = value?.toStringAsFixed(0) ?? '--';
-    final subtitle = data.minHumidity != null && data.maxHumidity != null
-        ? 'Range: ${data.minHumidity!.toStringAsFixed(0)}% to ${data.maxHumidity!.toStringAsFixed(0)}%'
-        : 'Waiting for data...';
+    final hasRange = data.minHumidity != null && data.maxHumidity != null;
     
     return DashboardCard(
       child: Column(
@@ -518,16 +579,81 @@ class _DashboardHomePageState extends State<DashboardHomePage> {
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Text(
-            subtitle,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.textMuted,
-              fontSize: 11,
+          if (hasRange) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.textMuted.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Min',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.textMuted,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${data.minHumidity!.toStringAsFixed(0)}%',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.chartHumidity.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Max',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.chartHumidity,
+                            fontSize: 10,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${data.maxHumidity!.toStringAsFixed(0)}%',
+                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.chartHumidity,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
+          ] else ...[
+            const SizedBox(height: 8),
+            Text(
+              'Waiting for data...',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textMuted,
+                fontSize: 11,
+              ),
+            ),
+          ],
         ],
       ),
     );
